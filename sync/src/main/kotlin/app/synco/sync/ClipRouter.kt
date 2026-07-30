@@ -9,6 +9,7 @@ import app.synco.protocol.message.Envelope
 import app.synco.protocol.message.TransferAbort
 import app.synco.protocol.message.TransferEnd
 import app.synco.protocol.message.TransferStart
+import app.synco.transfer.ReceivedFileDestination
 import app.synco.transfer.TransferIds
 
 class ClipRouter(
@@ -19,8 +20,12 @@ class ClipRouter(
     transfers: TransferGateway,
     blobs: BlobSender,
     private val events: SyncEventSink,
+    destination: ReceivedFileDestination,
+    announcer: ReceivedFileAnnouncer,
 ) {
     private val aborts = OutboundAborts()
+
+    private val files = InboundFilePublisher(destination, announcer)
 
     private val sender = ClipSender(selfDeviceId, link, settings, blobs, aborts, events)
 
@@ -28,7 +33,7 @@ class ClipRouter(
         selfDeviceId = selfDeviceId,
         settings = settings,
         transfers = transfers,
-        acknowledger = ClipAcknowledger(link, clipboard, transfers, events),
+        acknowledger = ClipAcknowledger(link, clipboard, transfers, events, files),
     )
 
     suspend fun send(snapshot: ClipboardSnapshot): Boolean = sender.send(snapshot)

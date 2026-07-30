@@ -7,6 +7,7 @@ import app.synco.discovery.NsdDiscoveryService
 import app.synco.storage.SettingsStore
 import app.synco.storage.SyncoStorage
 import app.synco.storage.TrustedPeerStore
+import app.synco.transfer.DocumentTreeDestination
 import app.synco.transport.SyncoClient
 import app.synco.transport.SyncoSocketFactory
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,12 @@ class SyncoGraph private constructor(
             val transfers = TransferLayer(application)
             val clipboard = ClipboardLayer(application, transfers)
             val state = SyncStateHolder()
+            val folder = ReceivedFolder(storage.settings, scope)
+            val destination = DocumentTreeDestination(
+                resolver = application.contentResolver,
+                treeUri = folder::uri,
+                folderLabel = folder::label,
+            )
             val pairings = PairingCoordinator(storage.trustedPeers, state)
             val sockets = SyncoSocketFactory()
             val discovery = NsdDiscoveryService.create(application, scope)
@@ -46,6 +53,8 @@ class SyncoGraph private constructor(
                     transfers = transfers.gateway,
                     blobs = TransferBlobSender(transfers.gateway),
                     events = state,
+                    destination = destination,
+                    announcer = ToastAnnouncer(application),
                 ),
                 pairings = pairings,
                 pipelines = EnginePipelines(

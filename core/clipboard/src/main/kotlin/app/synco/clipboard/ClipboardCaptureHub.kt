@@ -65,16 +65,19 @@ class ClipboardCaptureHub(
     override fun clipTimestamp(): Long? = reader.clipTimestamp()
 
     override fun setAccessibilityConnected(connected: Boolean) {
+        SyncoLog.clipboard.info("accessibility capture route ${if (connected) "connected" else "disconnected"}")
         this.connected.value = connected
         recomputeStatus()
     }
 
     private fun recomputeStatus() {
-        statusFlow.value = when {
+        val next = when {
             !connected.value -> ClipboardCaptureStatus.SERVICE_DISABLED
             !observedAccessibilityCopy.value -> ClipboardCaptureStatus.AWAITING_FIRST_COPY
             else -> ClipboardCaptureStatus.WORKING
         }
+        SyncoLog.clipboard.debug { "capture status is now $next" }
+        statusFlow.value = next
     }
 
     private companion object {

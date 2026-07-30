@@ -88,4 +88,9 @@
     <string name="problem_network_unavailable">No usable network. Connect this phone to the same Wi-Fi network as your Mac.</string>
     <string name="problem_discovery_unavailable">Local network discovery is unavailable, so your Mac cannot be found.</string>
     <string name="problem_listener_unavailable">Synco could not open its network listener, so no connection can be made.</string>
+    <string name="received_folder_title">Where received files go</string>
+    <string name="received_folder_unset">Files from your Mac are saved where you cannot browse them. Choose a folder to fix that. Android will not let you pick Download or the storage root itself, so open one and pick a folder inside it, or make a new one.</string>
+    <string name="received_folder_set">Saving to %1$s</string>
+    <string name="received_folder_choose">Choose folder</string>
+    <string name="received_folder_clear">Clear</string>
 </resources>

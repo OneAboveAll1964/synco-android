@@ -20,6 +20,7 @@ internal object HomeStateMapper {
         paused = preferences.paused,
         launchOnBoot = preferences.launchOnBoot,
         displayName = preferences.displayName,
+        receivedFolder = preferences.receivedFolder,
         identity = state.identity,
         peers = peerRows(state, policies, trusted),
         transfers = state.transfers,

@@ -15,6 +15,8 @@ interface HomeActions {
 
     fun setDisplayName(displayName: String)
 
+    fun setReceivedFolder(treeUri: String?)
+
     fun setDirection(deviceId: DeviceId, direction: SyncDirection)
 
     fun setSendEnabled(deviceId: DeviceId, category: ClipCategory, enabled: Boolean)

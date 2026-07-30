@@ -31,6 +31,8 @@ class SyncCommands internal constructor(
 
     fun setLaunchOnBoot(enabled: Boolean) = fire { settings.setLaunchOnBoot(enabled) }
 
+    fun setReceivedFolder(treeUri: String?) = fire { settings.setReceivedFolder(treeUri) }
+
     fun setDisplayName(displayName: String) = fire {
         settings.setDisplayName(displayName)
         if (engine.isRunning) engine.restart()

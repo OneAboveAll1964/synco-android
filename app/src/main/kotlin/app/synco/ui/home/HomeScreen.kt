@@ -56,6 +56,10 @@ fun HomeScreen(
             displayName = state.displayName,
             onDisplayNameChange = actions::setDisplayName,
         )
+        ReceivedFolderCard(
+            receivedFolder = state.receivedFolder,
+            onFolderChosen = actions::setReceivedFolder,
+        )
         if (state.transfers.isNotEmpty()) {
             TransferList(transfers = state.transfers, onCancel = actions::cancelTransfer)
         }

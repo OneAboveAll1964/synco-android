@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="received_files_count">%1$d files</string>
+    <string name="received_saved_to">Saved %1$s to %2$s</string>
+    <string name="received_saved">Saved %1$s</string>
+</resources>

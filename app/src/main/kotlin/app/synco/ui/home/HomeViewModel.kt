@@ -48,6 +48,10 @@ class HomeViewModel(
         graph.commands.setDisplayName(displayName)
     }
 
+    override fun setReceivedFolder(treeUri: String?) {
+        graph.commands.setReceivedFolder(treeUri)
+    }
+
     override fun setDirection(deviceId: DeviceId, direction: SyncDirection) {
         graph.commands.setDirection(deviceId, direction)
     }

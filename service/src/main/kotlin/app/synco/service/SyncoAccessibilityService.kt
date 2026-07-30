@@ -30,7 +30,9 @@ class SyncoAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         gate = FocusGate(this)
         detector = CopyIntentDetector(CopyLabelResolver.resolve(this), packageName)
-        capture = syncoGraphOrNull()?.clipboard?.also { it.setAccessibilityConnected(true) }
+        val graph = syncoGraphOrNull()
+        if (graph == null) SyncoLog.clipboard.warn("the accessibility service connected before the graph existed")
+        capture = graph?.clipboard?.also { it.setAccessibilityConnected(true) }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {

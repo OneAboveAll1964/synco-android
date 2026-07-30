@@ -10,6 +10,7 @@ internal class ClipAcknowledger(
     private val clipboard: ClipboardSink,
     private val transfers: TransferGateway,
     private val events: SyncEventSink,
+    private val files: InboundFilePublisher,
 ) {
     suspend fun apply(assembly: InboundClipAssembly) {
         val written = clipboard.apply(assembly.clip.hash, assembly.reps, assembly.blobs)
@@ -17,6 +18,7 @@ internal class ClipAcknowledger(
             decline(assembly.clip.id, AckReason.USER_CANCELLED)
             return
         }
+        files.publish(assembly)
         link.send(Ack.applied(assembly.clip.id))
         events.record(SyncEvent.of(SyncEvent.Kind.CLIP_APPLIED, link.peerDeviceId, assembly.clip.id))
     }
