@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="synco_notification_channel_name">Clipboard sync</string>
+    <string name="synco_notification_channel_description">Ongoing status while Synco keeps this phone and your Mac on the same clipboard.</string>
+    <string name="synco_notification_title">Synco</string>
+    <string name="synco_notification_action_pause">Pause</string>
+    <string name="synco_notification_action_resume">Resume</string>
+    <string name="synco_notification_action_stop">Stop</string>
+
+    <string name="synco_status_stopped">Sync is off</string>
+    <string name="synco_status_paused">Paused</string>
+    <string name="synco_status_searching">Looking for your Mac</string>
+    <string name="synco_status_connected">Connected to %1$s</string>
+
+    <string name="synco_tile_label">Synco</string>
+
+    <string name="synco_accessibility_label">Synco clipboard access</string>
+    <string name="synco_accessibility_summary">Lets Synco read the clipboard while the app is in the background</string>
+    <string name="synco_accessibility_description">Android only lets the app holding the current window read the clipboard. When you copy something, Synco briefly adds a tiny invisible window to take input focus for a few milliseconds, reads the clip, then removes it, so a copy you make in any app can reach your Mac. Synco reads only right after a copy and never reads, stores, or sends the contents of any screen.</string>
+</resources>

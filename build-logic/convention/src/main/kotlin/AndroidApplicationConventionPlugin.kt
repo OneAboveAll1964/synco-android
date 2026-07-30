@@ -1,0 +1,44 @@
+import app.synco.buildlogic.BuildConstants
+import app.synco.buildlogic.configureAndroidKotlin
+import app.synco.buildlogic.libs
+import com.android.build.api.dsl.ApplicationExtension
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+
+class AndroidApplicationConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        pluginManager.apply("com.android.application")
+        pluginManager.apply("org.jetbrains.kotlin.android")
+
+        extensions.configure<ApplicationExtension> {
+            configureAndroidKotlin(this)
+            defaultConfig {
+                applicationId = BuildConstants.APPLICATION_ID
+                targetSdk = BuildConstants.TARGET_SDK
+                versionCode = BuildConstants.VERSION_CODE
+                versionName = BuildConstants.VERSION_NAME
+            }
+            buildTypes {
+                getByName("release") {
+                    isMinifyEnabled = true
+                    isShrinkResources = true
+                    proguardFiles(
+                        getDefaultProguardFile("proguard-android-optimize.txt"),
+                        "proguard-rules.pro",
+                    )
+                }
+                getByName("debug") {
+                    applicationIdSuffix = ".debug"
+                    versionNameSuffix = "-debug"
+                }
+            }
+        }
+
+        dependencies {
+            add("implementation", libs.findLibrary("kotlinx-coroutines-android").get())
+            add("testImplementation", libs.findLibrary("junit").get())
+        }
+    }
+}

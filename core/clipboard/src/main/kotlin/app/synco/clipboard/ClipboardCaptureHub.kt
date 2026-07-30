@@ -1,0 +1,83 @@
+package app.synco.clipboard
+
+import app.synco.logging.SyncoLog
+import app.synco.protocol.ProtocolConstants
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.UUID
+
+class ClipboardCaptureHub(
+    private val reader: ClipboardReader,
+    private val suppression: SuppressionWindow,
+    private val maxBlobBytes: Long = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
+) : ClipboardCapture {
+
+    private val emissions = MutableSharedFlow<CapturedClip>(
+        extraBufferCapacity = EMISSION_BUFFER,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
+    private val readLock = Mutex()
+
+    private val settle = ClipSettle()
+
+    private val connected = MutableStateFlow(false)
+
+    private val observedAccessibilityCopy = MutableStateFlow(false)
+
+    private val statusFlow = MutableStateFlow(ClipboardCaptureStatus.SERVICE_DISABLED)
+
+    override val changes: Flow<CapturedClip> = emissions
+
+    override val status: StateFlow<ClipboardCaptureStatus> = statusFlow.asStateFlow()
+
+    override suspend fun captureVia(route: CaptureRoute) {
+        val snapshot = readLock.withLock {
+            val settled = settle.awaitFresh(reader::clipTimestamp)
+            if (settled == SettleOutcome.STALE) {
+                SyncoLog.clipboard.debug { "the clipboard never changed after a copy signal" }
+                return
+            }
+            val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes) ?: return
+            if (suppression.consume(candidate.hash)) {
+                SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
+                return
+            }
+            candidate
+        }
+        SyncoLog.clipboard.info(
+            "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
+                "and ${snapshot.transfers.size} blob(s)",
+        )
+        if (route == CaptureRoute.ACCESSIBILITY_FOCUS_GATE) {
+            observedAccessibilityCopy.value = true
+            recomputeStatus()
+        }
+        emissions.emit(CapturedClip(snapshot, route))
+    }
+
+    override fun clipTimestamp(): Long? = reader.clipTimestamp()
+
+    override fun setAccessibilityConnected(connected: Boolean) {
+        this.connected.value = connected
+        recomputeStatus()
+    }
+
+    private fun recomputeStatus() {
+        statusFlow.value = when {
+            !connected.value -> ClipboardCaptureStatus.SERVICE_DISABLED
+            !observedAccessibilityCopy.value -> ClipboardCaptureStatus.AWAITING_FIRST_COPY
+            else -> ClipboardCaptureStatus.WORKING
+        }
+    }
+
+    private companion object {
+        const val EMISSION_BUFFER = 8
+    }
+}

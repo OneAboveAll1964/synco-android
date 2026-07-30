@@ -1,0 +1,9 @@
+package app.synco.sync
+
+enum class SyncProblem {
+    IDENTITY_UNREADABLE,
+    CLIPBOARD_UNREADABLE,
+    NETWORK_UNAVAILABLE,
+    DISCOVERY_UNAVAILABLE,
+    LISTENER_UNAVAILABLE,
+}

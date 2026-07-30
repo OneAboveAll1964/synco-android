@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Synco</string>
+
+    <string name="home_status_stopped">Sync is off</string>
+    <string name="home_status_paused">Paused — nothing moves in either direction</string>
+    <string name="home_status_searching">Looking for your Mac on this network</string>
+    <string name="home_status_connected">Connected to %1$s</string>
+
+    <string name="control_running_title">Clipboard sync</string>
+    <string name="control_paused_title">Pause</string>
+    <string name="control_paused_subtitle">Keep every setting, stop moving clips</string>
+    <string name="control_boot_title">Start when the phone boots</string>
+    <string name="control_boot_subtitle">Sync comes back on its own after a restart</string>
+
+    <string name="identity_heading">This phone</string>
+    <string name="identity_name_label">Name shown on your Mac</string>
+    <string name="identity_name_save">Save name</string>
+    <string name="identity_pending">The fingerprint appears once sync has started.</string>
+    <string name="identity_fingerprint_label">Fingerprint — compare this with the one your Mac shows</string>
+
+    <string name="peers_heading">Devices</string>
+    <string name="peers_empty">No Mac found yet. Open Synco on your Mac and keep both devices on the same Wi-Fi network.</string>
+    <string name="peer_send_heading">Send to Mac</string>
+    <string name="peer_receive_heading">Accept from Mac</string>
+    <string name="peer_reconnect">Reconnect</string>
+    <string name="peer_forget">Forget</string>
+    <string name="peer_caps_notice">%1$s is not accepting: %2$s</string>
+    <string name="peer_unpaired_note">Not paired yet. Once this device is paired you can choose what it sends and accepts.</string>
+
+    <string name="peer_status_offline">Offline</string>
+    <string name="peer_status_discovered">Found on this network</string>
+    <string name="peer_status_waiting">Waiting for the Mac to dial</string>
+    <string name="peer_status_connecting">Connecting</string>
+    <string name="peer_status_retrying">Retrying</string>
+    <string name="peer_status_pairing">Waiting for approval</string>
+    <string name="peer_status_connected">Connected</string>
+    <string name="peer_status_rejected">Rejected</string>
+
+    <string name="direction_heading">Direction</string>
+    <string name="direction_both">Both ways</string>
+    <string name="direction_outbound">Phone to Mac</string>
+    <string name="direction_inbound">Mac to phone</string>
+    <string name="direction_none">Paused</string>
+    <string name="direction_both_explanation">A copy on either device lands on the other.</string>
+    <string name="direction_outbound_explanation">Copies made on this phone reach the Mac. Nothing comes back.</string>
+    <string name="direction_inbound_explanation">Copies made on the Mac land on this phone. Nothing is sent out.</string>
+    <string name="direction_none_explanation">Nothing moves between this phone and the Mac.</string>
+
+    <string name="category_text">Text</string>
+    <string name="category_image">Images</string>
+    <string name="category_file">Files</string>
+
+    <string name="transfers_heading">Transfers</string>
+    <string name="transfers_incoming">Incoming</string>
+    <string name="transfers_outgoing">Outgoing</string>
+    <string name="transfers_cancel">Cancel transfer</string>
+
+    <string name="pairing_title">Pair with %1$s?</string>
+    <string name="pairing_body">%1$s (%2$s) wants to share a clipboard with this phone.</string>
+    <string name="pairing_compare_hint">Approve only if these four blocks match the fingerprint shown on the Mac, in the same order.</string>
+    <string name="pairing_approve">Pair</string>
+    <string name="pairing_reject">Reject</string>
+
+    <string name="permissions_card_title">Sync needs your attention</string>
+    <string name="permission_notifications_title">Allow notifications</string>
+    <string name="permission_notifications_explanation">Android requires an ongoing notification for a background sync service. Without it the service cannot keep running.</string>
+    <string name="permission_notifications_action">Allow notifications</string>
+    <string name="permission_accessibility_title">Turn on Synco clipboard access</string>
+    <string name="permission_accessibility_explanation">Android only lets the app holding the current window read the clipboard. When you copy something, Synco briefly adds a tiny invisible window to take input focus for a few milliseconds, reads the clip, then removes the window. Because of this, focus flickers to Synco for an instant each time you copy. Synco reads only right after a copy and never inspects the contents of your screen.</string>
+    <string name="permission_accessibility_action">Open accessibility settings</string>
+
+    <string name="clipboard_status_service_disabled">Background clipboard capture is off. Turn on Synco clipboard access so copies made in other apps reach your Mac.</string>
+    <string name="clipboard_status_awaiting_copy">Clipboard access is on. Copy something in any app and Synco will pick it up.</string>
+    <string name="clipboard_status_working">Background clipboard capture is working.</string>
+    <string name="permission_battery_title">Exempt Synco from battery optimisation</string>
+    <string name="permission_battery_explanation">Battery optimisation can suspend the network connection while the screen is off, which makes copies arrive minutes late or not at all.</string>
+    <string name="permission_battery_action">Open battery settings</string>
+
+    <string name="identity_reset_action">Create a new identity</string>
+    <string name="identity_reset_title">Create a new identity?</string>
+    <string name="identity_reset_body">This phone gets a brand new device identity and fingerprint. Every device you have already paired with will no longer recognise this phone, so you have to pair with your Mac again. Nothing else is deleted.</string>
+    <string name="identity_reset_confirm">Create a new identity</string>
+    <string name="identity_reset_cancel">Keep waiting</string>
+
+    <string name="problem_identity_unreadable">Synco could not read this phone\'s saved identity, so sync cannot start. This usually follows a system update that invalidated the phone\'s key store. Nothing has been changed. You can create a new identity, but every device you paired with will need to pair again.</string>
+    <string name="problem_clipboard_unreadable">The clipboard cannot be read right now. Turn on Synco clipboard access to fix this.</string>
+    <string name="problem_network_unavailable">No usable network. Connect this phone to the same Wi-Fi network as your Mac.</string>
+    <string name="problem_discovery_unavailable">Local network discovery is unavailable, so your Mac cannot be found.</string>
+    <string name="problem_listener_unavailable">Synco could not open its network listener, so no connection can be made.</string>
+</resources>

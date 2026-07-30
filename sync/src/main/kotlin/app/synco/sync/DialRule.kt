@@ -1,0 +1,21 @@
+package app.synco.sync
+
+import app.synco.crypto.HandshakeRole
+import app.synco.protocol.DeviceId
+
+internal object DialRule {
+
+    fun roleFor(selfDeviceId: DeviceId, peerDeviceId: DeviceId): HandshakeRole =
+        HandshakeRole.of(selfDeviceId, peerDeviceId)
+
+    fun intentOf(
+        role: HandshakeRole,
+        discovered: Boolean,
+        rejected: Boolean,
+        live: Boolean,
+    ): PeerIntent = when {
+        live || rejected || !discovered -> PeerIntent.IDLE
+        role.dials -> PeerIntent.DIAL
+        else -> PeerIntent.WAIT
+    }
+}
