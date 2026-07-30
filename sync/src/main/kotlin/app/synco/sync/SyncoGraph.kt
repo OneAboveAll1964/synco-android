@@ -60,7 +60,6 @@ class SyncoGraph private constructor(
                 pipelines = EnginePipelines(
                     clipboard = ClipboardPipeline(
                         capture = clipboard.capture,
-                        foreground = clipboard.foregroundListener,
                         dispatcher = OutboundClipDispatcher(transfers.gateway),
                         state = state,
                     ),

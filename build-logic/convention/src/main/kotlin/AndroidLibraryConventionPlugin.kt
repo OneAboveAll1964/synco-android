@@ -16,6 +16,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             configureAndroidKotlin(this)
             testOptions.targetSdk = BuildConstants.TARGET_SDK
             testOptions.unitTests.isIncludeAndroidResources = true
+            testOptions.unitTests.isReturnDefaultValues = true
             lint.targetSdk = BuildConstants.TARGET_SDK
         }
 

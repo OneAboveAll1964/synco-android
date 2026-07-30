@@ -60,6 +60,8 @@ class PeerSessionRegistryTest {
                 transfers = StubTransferGateway(),
                 blobs = StubBlobSender(),
                 events = events,
+                destination = NoReceivedFileDestination(),
+                announcer = RecordingAnnouncer(),
             ),
             dialer = dialer,
             events = events,

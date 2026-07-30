@@ -1,5 +1,7 @@
 package app.synco.sync
 
+import app.synco.transfer.ReceivedFileDestination
+
 import app.synco.clipboard.ClipboardSnapshot
 import app.synco.protocol.DeviceId
 import app.synco.protocol.ProtocolConstants
@@ -65,5 +67,8 @@ internal object ClipFixtures {
         transfers: TransferGateway = StubTransferGateway(),
         blobs: BlobSender = StubBlobSender(),
         events: SyncEventSink = RecordingEvents(),
-    ): ClipRouter = ClipRouter(SELF, link, settings, clipboard, transfers, blobs, events)
+        destination: ReceivedFileDestination = NoReceivedFileDestination(),
+        announcer: ReceivedFileAnnouncer = RecordingAnnouncer(),
+    ): ClipRouter =
+        ClipRouter(SELF, link, settings, clipboard, transfers, blobs, events, destination, announcer)
 }

@@ -58,7 +58,9 @@ class FocusGate(
             OVERLAY_SIZE,
             OVERLAY_SIZE,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             PixelFormat.TRANSPARENT,
         ).apply { gravity = Gravity.TOP or Gravity.START }
 
@@ -72,6 +74,8 @@ class FocusGate(
             super.onWindowFocusChanged(hasWindowFocus)
             if (hasWindowFocus && !focused.isCompleted) focused.complete(Unit)
         }
+
+        override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean = false
     }
 
     private companion object {

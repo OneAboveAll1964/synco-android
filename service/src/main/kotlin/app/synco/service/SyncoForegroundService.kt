@@ -17,6 +17,8 @@ class SyncoForegroundService : LifecycleService() {
 
     private val locks by lazy { SyncoRuntimeLocks(this) }
 
+    private val watcher by lazy { ClipboardChangeWatcher(this, lifecycleScope) }
+
     @Volatile
     private var syncing = false
 
@@ -24,6 +26,7 @@ class SyncoForegroundService : LifecycleService() {
         super.onCreate()
         notifications.createChannel()
         lifecycleScope.launch { graph.state.collect(::publish) }
+        watcher.start()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -42,6 +45,7 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        watcher.stop()
         syncing = false
         locks.release()
         super.onDestroy()

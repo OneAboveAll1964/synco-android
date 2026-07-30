@@ -5,52 +5,36 @@ import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import app.synco.clipboard.CaptureRoute
 import app.synco.clipboard.ClipboardCapture
-import app.synco.clipboard.CopyGateThrottle
-import app.synco.clipboard.CopyIntentDetector
-import app.synco.logging.SyncoLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
-class SyncoAccessibilityService : AccessibilityService() {
+class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    private val throttle = CopyGateThrottle()
+    private val captureLock = Mutex()
 
     private var gate: FocusGate? = null
-
-    private var detector: CopyIntentDetector? = null
 
     private var capture: ClipboardCapture? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         gate = FocusGate(this)
-        detector = CopyIntentDetector(CopyLabelResolver.resolve(this), packageName)
-        val graph = syncoGraphOrNull()
-        if (graph == null) SyncoLog.clipboard.warn("the accessibility service connected before the graph existed")
-        capture = graph?.clipboard?.also { it.setAccessibilityConnected(true) }
+        capture = syncoGraphOrNull()?.clipboard?.also { it.setAccessibilityConnected(true) }
+        FocusGateHolder.install(this)
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val detector = detector ?: return
-        val signal = AccessibilitySignals.of(event) ?: return
-        if (!detector.observe(signal)) return
-        if (!throttle.accept(signal.timestampMillis)) {
-            SyncoLog.clipboard.debug { "throttled a copy signal ${signal.kind}" }
-            return
-        }
-        SyncoLog.clipboard.info("copy detected from ${signal.packageName ?: "?"} via ${signal.kind}")
-        captureThroughFocus()
-    }
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
-    private fun captureThroughFocus() {
+    override suspend fun captureThroughFocus() {
         val gate = gate ?: return
         val capture = capture ?: return
-        scope.launch {
+        captureLock.withLock {
             gate.withFocus { capture.captureVia(CaptureRoute.ACCESSIBILITY_FOCUS_GATE) }
         }
     }
@@ -58,14 +42,18 @@ class SyncoAccessibilityService : AccessibilityService() {
     override fun onInterrupt() = Unit
 
     override fun onUnbind(intent: Intent?): Boolean {
-        capture?.setAccessibilityConnected(false)
+        release()
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        capture?.setAccessibilityConnected(false)
+        release()
         scope.cancel()
         super.onDestroy()
     }
 
+    private fun release() {
+        FocusGateHolder.remove(this)
+        capture?.setAccessibilityConnected(false)
+    }
 }
