@@ -8,10 +8,13 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 class ClipboardChangeWatcher(context: Context, private val scope: CoroutineScope) {
 
     private val clipboard = context.getSystemService(ClipboardManager::class.java)
+
+    private val fired = AtomicInteger()
 
     private val changes = MutableSharedFlow<Unit>(
         extraBufferCapacity = BUFFER,
@@ -19,6 +22,7 @@ class ClipboardChangeWatcher(context: Context, private val scope: CoroutineScope
     )
 
     private val listener = ClipboardManager.OnPrimaryClipChangedListener {
+        SyncoLog.clipboard.info("clipboard change signalled, total=${fired.incrementAndGet()}")
         changes.tryEmit(Unit)
     }
 
@@ -29,10 +33,11 @@ class ClipboardChangeWatcher(context: Context, private val scope: CoroutineScope
             return
         }
         runCatching { manager.addPrimaryClipChangedListener(listener) }
+            .onSuccess { SyncoLog.clipboard.info("watching the clipboard for changes") }
             .onFailure { SyncoLog.clipboard.warn("could not observe clipboard changes", it) }
         scope.launch {
             changes.collectLatest {
-                SyncoLog.clipboard.info("the system reported a clipboard change")
+                SyncoLog.clipboard.info("capturing after a clipboard change")
                 FocusGateHolder.captureNow()
             }
         }

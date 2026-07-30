@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityEventTypes="typeViewClicked|typeViewLongClicked|typeViewTextSelectionChanged|typeWindowStateChanged"
     android:accessibilityFeedbackType="feedbackGeneric"
     android:accessibilityFlags="flagDefault"
     android:canRequestFilterKeyEvents="false"
     android:canRetrieveWindowContent="false"
     android:description="@string/synco_accessibility_description"
-    android:notificationTimeout="1000"
+    android:notificationTimeout="100"
     android:summary="@string/synco_accessibility_summary" />
