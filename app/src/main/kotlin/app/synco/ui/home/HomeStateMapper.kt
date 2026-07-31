@@ -21,6 +21,8 @@ internal object HomeStateMapper {
         launchOnBoot = preferences.launchOnBoot,
         displayName = preferences.displayName,
         receivedFolder = preferences.receivedFolder,
+        maxBlobBytes = preferences.maxBlobBytes,
+        captureWaitMillis = preferences.captureWaitMillis,
         identity = state.identity,
         peers = peerRows(state, policies, trusted),
         transfers = state.transfers,

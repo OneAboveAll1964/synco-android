@@ -26,7 +26,9 @@ class SyncoGraph private constructor(
             val application = context.applicationContext
             val storage = SyncoStorage.create(application)
             val transfers = TransferLayer(application)
-            val clipboard = ClipboardLayer(application, transfers)
+            val blobLimit = BlobSizeLimit(storage.settings, scope)
+            val captureWait = CaptureWait(storage.settings, scope)
+            val clipboard = ClipboardLayer(application, transfers, blobLimit::bytes, captureWait::millis)
             val state = SyncStateHolder()
             val folder = ReceivedFolder(storage.settings, scope)
             val destination = DocumentTreeDestination(

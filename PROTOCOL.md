@@ -294,7 +294,7 @@ did not sync instead of silently dropping it.
 { "t": "caps",
   "accepts": { "text": true, "image": true, "file": true },
   "sends":   { "text": true, "image": true, "file": false },
-  "maxBlob": 104857600 }
+  "maxBlob": 1073741824 }
 ```
 
 `accepts` is what this device will apply to its own clipboard (its receive toggles).
@@ -478,7 +478,7 @@ per-type configuration.
 | max frame payload       | 1 MiB        |
 | max blob chunk          | 256 KiB      |
 | inline rep threshold    | 64 KiB       |
-| default max blob        | 100 MiB      |
+| default max blob        | 1 GiB        |
 | ping interval           | 15 s         |
 | read timeout            | 45 s         |
 | pair timeout            | 120 s        |

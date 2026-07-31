@@ -52,6 +52,14 @@ class HomeViewModel(
         graph.commands.setReceivedFolder(treeUri)
     }
 
+    override fun setMaxBlobBytes(bytes: Long) {
+        graph.commands.setMaxBlobBytes(bytes)
+    }
+
+    override fun setCaptureWaitMillis(millis: Long) {
+        graph.commands.setCaptureWaitMillis(millis)
+    }
+
     override fun setDirection(deviceId: DeviceId, direction: SyncDirection) {
         graph.commands.setDirection(deviceId, direction)
     }

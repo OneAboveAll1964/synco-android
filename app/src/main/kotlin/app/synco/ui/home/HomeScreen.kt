@@ -60,6 +60,10 @@ fun HomeScreen(
             receivedFolder = state.receivedFolder,
             onFolderChosen = actions::setReceivedFolder,
         )
+        BlobSizeCard(
+            maxBlobBytes = state.maxBlobBytes,
+            onMaxBlobBytesChange = actions::setMaxBlobBytes,
+        )
         if (state.transfers.isNotEmpty()) {
             TransferList(transfers = state.transfers, onCancel = actions::cancelTransfer)
         }

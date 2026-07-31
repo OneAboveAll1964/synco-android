@@ -3,7 +3,7 @@ package app.synco.clipboard
 import kotlinx.coroutines.delay
 
 class ClipSettle(
-    private val budgetMillis: Long = DEFAULT_BUDGET_MILLIS,
+    private val budgetMillis: () -> Long = { DEFAULT_BUDGET_MILLIS },
     private val stepMillis: Long = DEFAULT_STEP_MILLIS,
 ) {
     private var lastTimestamp = UNSET
@@ -11,8 +11,9 @@ class ClipSettle(
     suspend fun awaitFresh(timestamp: () -> Long?): SettleOutcome {
         val first = timestamp() ?: return SettleOutcome.UNAVAILABLE
         if (advancedTo(first)) return SettleOutcome.FRESH
+        val budget = budgetMillis()
         var waited = 0L
-        while (waited < budgetMillis) {
+        while (waited < budget) {
             delay(stepMillis)
             waited += stepMillis
             val current = timestamp() ?: return SettleOutcome.UNAVAILABLE
@@ -28,8 +29,8 @@ class ClipSettle(
     }
 
     companion object {
-        const val DEFAULT_BUDGET_MILLIS = 450L
-        const val DEFAULT_STEP_MILLIS = 40L
+        const val DEFAULT_BUDGET_MILLIS = 200L
+        const val DEFAULT_STEP_MILLIS = 20L
         private const val UNSET = Long.MIN_VALUE
     }
 }

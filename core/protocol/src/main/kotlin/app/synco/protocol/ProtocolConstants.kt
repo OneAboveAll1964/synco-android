@@ -24,7 +24,7 @@ object ProtocolConstants {
     const val MAX_BLOB_CHUNK_BYTES = 262_144
 
     const val INLINE_REP_MAX_BYTES = 65_536
-    const val DEFAULT_MAX_BLOB_BYTES = 104_857_600L
+    const val DEFAULT_MAX_BLOB_BYTES = 1_073_741_824L
 
     const val PING_INTERVAL_MILLIS = 15_000L
     const val READ_TIMEOUT_MILLIS = 45_000L

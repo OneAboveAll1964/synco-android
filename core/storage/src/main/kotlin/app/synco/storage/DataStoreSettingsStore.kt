@@ -27,6 +27,15 @@ class DataStoreSettingsStore internal constructor(
     override val receivedFolder: Flow<String?> =
         snapshots.map { it.receivedFolder }.distinctUntilChanged()
 
+    override val captureTuning: Flow<CaptureTuning> =
+        snapshots.map { it.captureTuning }.distinctUntilChanged()
+
+    override val captureMode: Flow<CaptureMode> =
+        snapshots.map { it.captureMode }.distinctUntilChanged()
+
+    override val shizukuPollMillis: Flow<Long> =
+        snapshots.map { it.shizukuPollMillis }.distinctUntilChanged()
+
     override val paused: Flow<Boolean> =
         snapshots.map { it.paused }.distinctUntilChanged()
 
@@ -56,6 +65,21 @@ class DataStoreSettingsStore internal constructor(
         } else {
             preferences[StorageKeys.RECEIVED_FOLDER] = treeUri
         }
+    }
+
+    override suspend fun setCaptureMode(mode: CaptureMode) = write { preferences ->
+        preferences[StorageKeys.CAPTURE_MODE] = mode.wireValue
+    }
+
+    override suspend fun setShizukuPollMillis(millis: Long) = write { preferences ->
+        preferences[StorageKeys.SHIZUKU_POLL_MILLIS] = millis
+    }
+
+    override suspend fun setCaptureTuning(tuning: CaptureTuning) = write { preferences ->
+        preferences[StorageKeys.CAPTURE_WAIT_MILLIS] = tuning.waitMillis
+        preferences[StorageKeys.FOCUS_TIMEOUT_MILLIS] = tuning.focusTimeoutMillis
+        preferences[StorageKeys.CAPTURE_ATTEMPTS] = tuning.attemptsPerGesture
+        preferences[StorageKeys.GESTURE_WINDOW_MILLIS] = tuning.gestureWindowMillis
     }
 
     override suspend fun setPaused(paused: Boolean) = write { preferences ->

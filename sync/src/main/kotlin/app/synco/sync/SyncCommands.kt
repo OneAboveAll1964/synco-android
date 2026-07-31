@@ -33,6 +33,10 @@ class SyncCommands internal constructor(
 
     fun setReceivedFolder(treeUri: String?) = fire { settings.setReceivedFolder(treeUri) }
 
+    fun setMaxBlobBytes(bytes: Long) = fire { settings.setMaxBlobBytes(bytes) }
+
+    fun setCaptureWaitMillis(millis: Long) = fire { settings.setCaptureWaitMillis(millis) }
+
     fun setDisplayName(displayName: String) = fire {
         settings.setDisplayName(displayName)
         if (engine.isRunning) engine.restart()

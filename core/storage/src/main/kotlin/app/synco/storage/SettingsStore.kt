@@ -11,6 +11,12 @@ interface SettingsStore {
 
     val receivedFolder: Flow<String?>
 
+    val captureTuning: Flow<CaptureTuning>
+
+    val captureMode: Flow<CaptureMode>
+
+    val shizukuPollMillis: Flow<Long>
+
     val paused: Flow<Boolean>
 
     val maxBlobBytes: Flow<Long>
@@ -26,6 +32,12 @@ interface SettingsStore {
     suspend fun setLaunchOnBoot(enabled: Boolean)
 
     suspend fun setReceivedFolder(treeUri: String?)
+
+    suspend fun setCaptureTuning(tuning: CaptureTuning)
+
+    suspend fun setCaptureMode(mode: CaptureMode)
+
+    suspend fun setShizukuPollMillis(millis: Long)
 
     suspend fun setPaused(paused: Boolean)
 

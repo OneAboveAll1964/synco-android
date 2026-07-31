@@ -93,4 +93,6 @@
     <string name="received_folder_set">Saving to %1$s</string>
     <string name="received_folder_choose">Choose folder</string>
     <string name="received_folder_clear">Clear</string>
+    <string name="blob_size_title">Largest file to accept</string>
+    <string name="blob_size_subtitle">Anything bigger than this is refused in both directions. Your Mac has its own limit, and the smaller of the two wins.</string>
 </resources>

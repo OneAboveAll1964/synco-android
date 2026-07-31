@@ -15,7 +15,8 @@ import java.util.UUID
 class ClipboardCaptureHub(
     private val reader: ClipboardReader,
     private val suppression: SuppressionWindow,
-    private val maxBlobBytes: Long = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
+    private val maxBlobBytes: () -> Long = { ProtocolConstants.DEFAULT_MAX_BLOB_BYTES },
+    captureWaitMillis: () -> Long = { ClipSettle.DEFAULT_BUDGET_MILLIS },
 ) : ClipboardCapture {
 
     private val emissions = MutableSharedFlow<CapturedClip>(
@@ -25,7 +26,7 @@ class ClipboardCaptureHub(
 
     private val readLock = Mutex()
 
-    private val settle = ClipSettle()
+    private val settle = ClipSettle(captureWaitMillis)
 
     private val connected = MutableStateFlow(false)
 
@@ -44,7 +45,7 @@ class ClipboardCaptureHub(
                 SyncoLog.clipboard.debug { "the clipboard never changed after a copy signal" }
                 return false
             }
-            val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes) ?: return false
+            val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes()) ?: return false
             if (suppression.consume(candidate.hash)) {
                 SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
                 return false

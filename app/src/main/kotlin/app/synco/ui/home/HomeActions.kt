@@ -17,6 +17,10 @@ interface HomeActions {
 
     fun setReceivedFolder(treeUri: String?)
 
+    fun setMaxBlobBytes(bytes: Long)
+
+    fun setCaptureWaitMillis(millis: Long)
+
     fun setDirection(deviceId: DeviceId, direction: SyncDirection)
 
     fun setSendEnabled(deviceId: DeviceId, category: ClipCategory, enabled: Boolean)

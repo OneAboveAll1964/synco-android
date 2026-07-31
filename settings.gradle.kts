@@ -29,6 +29,7 @@ rootProject.name = "synco"
 
 include(":app")
 include(":core:logging")
+include(":core:shizuku")
 include(":core:protocol")
 include(":core:crypto")
 include(":core:transport")

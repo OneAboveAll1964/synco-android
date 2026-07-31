@@ -9,7 +9,12 @@ import app.synco.clipboard.ClipboardReader
 import app.synco.clipboard.ClipboardWriter
 import app.synco.clipboard.SuppressionWindow
 
-internal class ClipboardLayer(context: Context, transfers: TransferLayer) {
+internal class ClipboardLayer(
+    context: Context,
+    transfers: TransferLayer,
+    maxBlobBytes: () -> Long,
+    captureWaitMillis: () -> Long,
+) {
 
     private val clipboardManager =
         requireNotNull(context.getSystemService(ClipboardManager::class.java)) {
@@ -20,7 +25,7 @@ internal class ClipboardLayer(context: Context, transfers: TransferLayer) {
 
     private val reader = ClipboardReader(clipboardManager, transfers.blobs, transfers.metadata)
 
-    private val hub = ClipboardCaptureHub(reader, suppression)
+    private val hub = ClipboardCaptureHub(reader, suppression, maxBlobBytes, captureWaitMillis)
 
     val capture: ClipboardCapture = hub
 

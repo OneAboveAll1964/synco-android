@@ -14,6 +14,20 @@ internal class SettingsSnapshot(preferences: Preferences, fallbackDisplayName: S
 
     val receivedFolder: String? = preferences[StorageKeys.RECEIVED_FOLDER]?.takeIf { it.isNotBlank() }
 
+    val captureMode: CaptureMode = CaptureMode.parse(preferences[StorageKeys.CAPTURE_MODE])
+
+    val shizukuPollMillis: Long = preferences[StorageKeys.SHIZUKU_POLL_MILLIS]
+        ?: ShizukuPollChoice.DEFAULT.millis
+
+    val captureTuning: CaptureTuning = CaptureTuning(
+        waitMillis = preferences[StorageKeys.CAPTURE_WAIT_MILLIS] ?: CaptureWaitChoice.DEFAULT.millis,
+        focusTimeoutMillis = preferences[StorageKeys.FOCUS_TIMEOUT_MILLIS]
+            ?: FocusTimeoutChoice.DEFAULT.millis,
+        attemptsPerGesture = preferences[StorageKeys.CAPTURE_ATTEMPTS] ?: AttemptsChoice.DEFAULT.attempts,
+        gestureWindowMillis = preferences[StorageKeys.GESTURE_WINDOW_MILLIS]
+            ?: GestureWindowChoice.DEFAULT.millis,
+    )
+
     val paused: Boolean = preferences[StorageKeys.PAUSED] ?: false
 
     val maxBlobBytes: Long = preferences[StorageKeys.MAX_BLOB_BYTES]

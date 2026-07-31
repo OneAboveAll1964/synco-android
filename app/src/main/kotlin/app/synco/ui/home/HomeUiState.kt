@@ -1,6 +1,8 @@
 package app.synco.ui.home
 
 import app.synco.clipboard.ClipboardCaptureStatus
+import app.synco.protocol.ProtocolConstants
+import app.synco.storage.CaptureWaitChoice
 import app.synco.sync.DeviceIdentity
 import app.synco.sync.PendingPairing
 import app.synco.sync.SyncProblem
@@ -12,6 +14,8 @@ data class HomeUiState(
     val launchOnBoot: Boolean,
     val displayName: String,
     val receivedFolder: String?,
+    val maxBlobBytes: Long,
+    val captureWaitMillis: Long,
     val identity: DeviceIdentity?,
     val peers: List<PeerRow>,
     val transfers: List<TransferView>,
@@ -28,6 +32,8 @@ data class HomeUiState(
             launchOnBoot = false,
             displayName = "",
             receivedFolder = null,
+            maxBlobBytes = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
+            captureWaitMillis = CaptureWaitChoice.DEFAULT.millis,
             identity = null,
             peers = emptyList(),
             transfers = emptyList(),
