@@ -40,17 +40,22 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val detector = detector ?: return
         val signal = AccessibilitySignals.of(event) ?: return
-        if (!detector.observe(signal)) return
+        val triggered = detector.observe(signal)
+        SyncoLog.clipboard.info(
+            "signal ${signal.kind} from ${signal.packageName ?: "?"} triggered=$triggered",
+        )
+        if (!triggered) return
         scope.launch { captureThroughFocus() }
     }
 
     override suspend fun captureThroughFocus() {
         val gate = gate ?: return
         val capture = capture ?: return
-        captureLock.withLock {
+        val captured = captureLock.withLock {
             SyncoLog.clipboard.info("opening the focus overlay to read the clip")
-            gate.withFocus { capture.captureVia(CaptureRoute.ACCESSIBILITY_FOCUS_GATE) }
+            gate.withFocus { capture.captureVia(CaptureRoute.ACCESSIBILITY_FOCUS_GATE) } == true
         }
+        if (captured) detector?.captured()
     }
 
     override fun onInterrupt() = Unit

@@ -27,18 +27,44 @@ class CopyIntentDetectorTest {
     }
 
     @Test
-    fun oneGestureCanOpenTheGateOnlyOnce() {
+    fun aSecondWindowChangeStillTriesWhenNothingWasCaptured() {
         val detector = detector()
         detector.observe(click(atMillis = 100))
         assertTrue(detector.observe(window(atMillis = 300)))
-        assertFalse(detector.observe(window(atMillis = 400)))
+        assertTrue(detector.observe(window(atMillis = 1_500)))
+    }
+
+    @Test
+    fun aSuccessfulCaptureDisarmsTheGesture() {
+        val detector = detector()
+        detector.observe(click(atMillis = 100))
+        assertTrue(detector.observe(window(atMillis = 300)))
+        detector.captured()
+        assertFalse(detector.observe(window(atMillis = 1_500)))
+    }
+
+    @Test
+    fun aGestureIsBoundedToTwoAttempts() {
+        val detector = detector()
+        detector.observe(click(atMillis = 100))
+        assertTrue(detector.observe(window(atMillis = 300)))
+        assertTrue(detector.observe(window(atMillis = 1_500)))
+        assertFalse(detector.observe(window(atMillis = 2_500)))
+    }
+
+    @Test
+    fun rapidWindowChangesAreSpacedOut() {
+        val detector = detector()
+        detector.observe(click(atMillis = 100))
+        assertTrue(detector.observe(window(atMillis = 300)))
+        assertFalse(detector.observe(window(atMillis = 350)))
     }
 
     @Test
     fun aWindowChangeLongAfterAGestureIsIgnored() {
         val detector = detector()
         detector.observe(click(atMillis = 100))
-        assertFalse(detector.observe(window(atMillis = 9_000)))
+        assertFalse(detector.observe(window(atMillis = 30_000)))
     }
 
     @Test

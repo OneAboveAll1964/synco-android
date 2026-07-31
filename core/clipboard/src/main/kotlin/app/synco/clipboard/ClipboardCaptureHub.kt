@@ -37,17 +37,17 @@ class ClipboardCaptureHub(
 
     override val status: StateFlow<ClipboardCaptureStatus> = statusFlow.asStateFlow()
 
-    override suspend fun captureVia(route: CaptureRoute) {
+    override suspend fun captureVia(route: CaptureRoute): Boolean {
         val snapshot = readLock.withLock {
             val settled = settle.awaitFresh(reader::clipTimestamp)
             if (settled == SettleOutcome.STALE) {
                 SyncoLog.clipboard.debug { "the clipboard never changed after a copy signal" }
-                return
+                return false
             }
-            val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes) ?: return
+            val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes) ?: return false
             if (suppression.consume(candidate.hash)) {
                 SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
-                return
+                return false
             }
             candidate
         }
@@ -60,6 +60,7 @@ class ClipboardCaptureHub(
             recomputeStatus()
         }
         emissions.emit(CapturedClip(snapshot, route))
+        return true
     }
 
     override fun clipTimestamp(): Long? = reader.clipTimestamp()

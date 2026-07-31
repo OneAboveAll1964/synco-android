@@ -9,7 +9,7 @@ interface ClipboardCapture {
 
     val status: StateFlow<ClipboardCaptureStatus>
 
-    suspend fun captureVia(route: CaptureRoute)
+    suspend fun captureVia(route: CaptureRoute): Boolean
 
     fun clipTimestamp(): Long?
 
