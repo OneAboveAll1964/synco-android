@@ -62,6 +62,12 @@ Choose Shizuku if you want it to simply work. Choose accessibility if you would
 rather not install anything else. If you pick Shizuku and it later is not
 running, Synco falls back to accessibility and tells you why.
 
+**Starting Shizuku from your Mac.** Because Shizuku stops at every reboot, Synco
+can ask your Mac to start it for you. Plug the phone in with USB debugging on,
+turn the option on in Synco's settings on the Mac, and a button appears on the
+phone. It runs one fixed command and nothing else, and only a device you have
+already paired can ask.
+
 ## Installing
 
 Grab the APK from [Releases](https://github.com/OneAboveAll1964/synco-android/releases)
@@ -102,11 +108,23 @@ will not let you pick `Download` or the storage root itself, so open one and pic
 a folder inside it, or make a new one.
 
 **Largest file.** Anything bigger is refused in both directions. Each device has
-its own limit and the smaller of the two wins.
+its own limit and the smaller of the two wins. Pick **No limit** if you would
+rather it never refuse anything.
 
 **Capture tuning.** How long to wait for the clipboard, how long to wait for
 focus, and how many times to re-read after a tap. Raise these if copies are
 missed on a slower phone; lower them if Synco feels intrusive.
+
+## Around the app
+
+**Home** is what has moved between your devices, newest first. **Service** has
+the switches and your paired devices. **Settings** has everything else.
+
+Large transfers show their progress in a notification, and on Android 16 and
+later it is a Live Update, so it stays on the lock screen and in the status bar
+while it runs. Older versions get an ordinary progress notification. Both
+devices report their own progress to each other, so the phone shows how much the
+Mac has actually taken, not just how much was sent.
 
 ## If something is not syncing
 
@@ -120,6 +138,8 @@ missed on a slower phone; lower them if Synco feels intrusive.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT with an attribution clause. See [LICENSE](LICENSE). You are free to use,
+change and redistribute Synco, including in your own products, as long as you
+credit the original author somewhere a user or reader can find it.
 
 Made by [OneAboveAll1964](https://github.com/OneAboveAll1964).

@@ -294,12 +294,17 @@ did not sync instead of silently dropping it.
 { "t": "caps",
   "accepts": { "text": true, "image": true, "file": true },
   "sends":   { "text": true, "image": true, "file": false },
-  "maxBlob": 1073741824 }
+  "maxBlob": 1073741824,
+  "adbShizuku": false }
 ```
 
 `accepts` is what this device will apply to its own clipboard (its receive toggles).
 `sends` is what it will originate (its send toggles). `maxBlob` is the largest single blob
-it will accept, in bytes.
+it will accept, in bytes; `9223372036854775807` means no limit.
+
+`adbShizuku` is optional and defaults to `false` when absent. It is `true` only when this
+device can run the Shizuku start command over adb on behalf of a paired peer and its user
+has turned that on. See §7.8.
 
 ### 7.2 `ping` / `pong`
 
@@ -437,6 +442,38 @@ never after `transferEnd`. `received` is the number of contiguous bytes written 
 
 This message is advisory. A device that never sends it is not at fault, and a sender that
 ignores it behaves exactly as before, so an implementation may skip it entirely.
+
+### 7.8 `shizukuStart` / `shizukuStartResult`
+
+Shizuku gives the Android side a reliable clipboard read, but it has to be started again
+after every reboot and starting it needs a computer with adb. When a phone is plugged into
+a paired desktop that advertises `adbShizuku`, it can ask that desktop to run the start
+command instead of the user reaching for a terminal.
+
+```json
+{ "t": "shizukuStart" }
+```
+
+```json
+{ "t": "shizukuStartResult", "started": true }
+{ "t": "shizukuStartResult", "started": false, "reason": "adbMissing" }
+```
+
+The request carries no fields. A receiver runs exactly one fixed command and nothing else:
+
+```
+adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
+```
+
+Nothing from the message reaches that command line, so a peer cannot choose what runs. A
+receiver must refuse the request unless the sender is a paired peer *and* its user has
+turned the option on; it answers `notAllowed` rather than staying silent.
+
+`reason` is absent when `started` is `true`. Otherwise it is one of `notAllowed`,
+`adbMissing` (no adb on that machine), `noDevice` (adb cannot see the phone), or `failed`.
+
+Both messages are optional. A device that never sends `shizukuStart` and one that answers
+every request with `notAllowed` are both conformant.
 
 ## 8. Canonical hash and loop suppression
 
