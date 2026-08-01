@@ -40,3 +40,22 @@
 -dontwarn com.google.errorprone.annotations.RestrictedApi
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.concurrent.GuardedBy
+
+-keep class rikka.shizuku.** { *; }
+-keep interface rikka.shizuku.** { *; }
+-keep class moe.shizuku.** { *; }
+-keep interface moe.shizuku.** { *; }
+-keep class rikka.sui.** { *; }
+-dontwarn rikka.shizuku.**
+-dontwarn moe.shizuku.**
+
+-keep class org.lsposed.hiddenapibypass.** { *; }
+-dontwarn org.lsposed.hiddenapibypass.**
+
+-keep class android.content.IClipboard { *; }
+-keep class android.content.IClipboard$* { *; }
+-keep class android.content.IOnPrimaryClipChangedListener { *; }
+-keep class android.content.IOnPrimaryClipChangedListener$* { *; }
+-dontwarn android.content.IOnPrimaryClipChangedListener
+
+-keep class app.synco.shizuku.** { *; }

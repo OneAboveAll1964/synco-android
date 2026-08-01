@@ -7,6 +7,9 @@ import app.synco.protocol.ProtocolConstants
 import app.synco.protocol.clip.ClipHash
 import app.synco.protocol.message.ClipRepKind
 import app.synco.transfer.ContentUriMetadata
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 class ClipboardReader(
     private val clipboardManager: ClipboardManager,
@@ -38,9 +41,11 @@ class ClipboardReader(
         clipId: String,
         maxBlobBytes: Long = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
     ): ClipboardSnapshot? {
-        val prepared = mutableListOf<PreparedRep>()
-        for (index in 0 until clip.itemCount) {
-            prepared += items.reps(clipId, clip.getItemAt(index), maxBlobBytes)
+        val prepared = coroutineScope {
+            (0 until clip.itemCount)
+                .map { index -> async { items.reps(clipId, clip.getItemAt(index), maxBlobBytes) } }
+                .awaitAll()
+                .flatten()
         }
         val ordered = RepOrder.sorted(dedupeInline(prepared))
         if (ordered.isEmpty()) {

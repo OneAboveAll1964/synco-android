@@ -6,10 +6,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationItemIconPosition
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -38,7 +40,7 @@ import app.synco.ui.home.homeStatusText
 import app.synco.ui.pairing.PairingDialog
 import app.synco.ui.permissions.rememberPermissionsController
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SyncoApp(modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -66,13 +68,14 @@ fun SyncoApp(modifier: Modifier = Modifier) {
             CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
         },
         bottomBar = {
-            NavigationBar {
+            ShortNavigationBar {
                 SyncoDestination.entries.forEach { entry ->
-                    NavigationBarItem(
+                    ShortNavigationBarItem(
                         selected = entry == destination,
                         onClick = { destination = entry },
                         icon = { Icon(imageVector = entry.icon, contentDescription = null) },
                         label = { Text(text = stringResource(entry.title)) },
+                        iconPosition = NavigationItemIconPosition.Start,
                     )
                 }
             }

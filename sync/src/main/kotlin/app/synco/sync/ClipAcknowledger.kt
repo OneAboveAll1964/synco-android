@@ -21,7 +21,7 @@ internal class ClipAcknowledger(
         }
         files.publish(assembly)
         link.send(Ack.applied(assembly.clip.id))
-        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_APPLIED, link.peerDeviceId, assembly.clip.id))
+        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_APPLIED, link.peerDeviceId, ClipSummary.of(assembly.clip.reps)))
     }
 
     suspend fun fail(assembly: InboundClipAssembly, failure: TransferFailure) {

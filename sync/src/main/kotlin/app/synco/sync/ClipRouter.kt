@@ -81,6 +81,6 @@ class ClipRouter(
 
     private fun onAck(ack: Ack) {
         val kind = if (ack.applied) SyncEvent.Kind.CLIP_ACKNOWLEDGED else SyncEvent.Kind.CLIP_REFUSED
-        events.record(SyncEvent.of(kind, link.peerDeviceId, ack.reason ?: ack.clipId))
+        events.record(SyncEvent.of(kind, link.peerDeviceId, ack.reason))
     }
 }

@@ -117,7 +117,6 @@
     <string name="shizuku_grant">Grant Synco access in Shizuku</string>
     <string name="shizuku_open">Open Shizuku</string>
     <string name="shizuku_get">Get Shizuku</string>
-    <string name="history_title">Recent activity</string>
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
     <string name="history_empty">Nothing has moved between your devices yet.</string>
@@ -138,7 +137,6 @@
     <string name="blob_size_unlimited">No limit</string>
     <string name="shizuku_start_over_adb">Start Shizuku using %1$s</string>
     <string name="shizuku_start_over_adb_hint">Your phone has to be plugged into that computer with USB debugging on.</string>
-    <string name="shizuku_start_sent">Asking your computer to start Shizuku…</string>
     <string name="shizuku_started">Shizuku is running. Synco switched to it.</string>
     <string name="shizuku_start_failed">Could not start Shizuku from your computer.</string>
     <string name="shizuku_start_not_allowed">Turn on the adb option in Synco’s settings on that computer first.</string>
@@ -152,6 +150,4 @@
     <string name="send_text">Send text</string>
     <string name="send_file">Send a file</string>
     <string name="send_text_hint">Text to send</string>
-    <string name="send_action">Send</string>
-    <string name="send_cancel">Cancel</string>
 </resources>

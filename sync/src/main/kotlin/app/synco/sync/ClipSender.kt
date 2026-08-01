@@ -17,17 +17,17 @@ internal class ClipSender(
     suspend fun send(snapshot: ClipboardSnapshot): Boolean {
         val sendable = settings.policy.sendableReps(snapshot.reps, settings.peerMaxBlobBytes)
         if (sendable.isEmpty()) {
-            events.record(SyncEvent.of(SyncEvent.Kind.CLIP_DROPPED, link.peerDeviceId, snapshot.clipId))
+            events.record(SyncEvent.of(SyncEvent.Kind.CLIP_DROPPED, link.peerDeviceId, ClipSummary.of(snapshot.reps)))
             return false
         }
         val clip = clipOf(snapshot, sendable)
         link.send(clip)
         for (rep in sendable.filter { StreamedReps.transferIdOf(it) != null }) {
             if (blobs.stream(snapshot, rep, link, aborts)) continue
-            events.record(SyncEvent.of(SyncEvent.Kind.TRANSFER_FAILED, link.peerDeviceId, clip.id))
+            events.record(SyncEvent.of(SyncEvent.Kind.TRANSFER_FAILED, link.peerDeviceId, ClipSummary.of(sendable)))
             return false
         }
-        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_SENT, link.peerDeviceId, clip.id))
+        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_SENT, link.peerDeviceId, ClipSummary.of(sendable)))
         return true
     }
 
