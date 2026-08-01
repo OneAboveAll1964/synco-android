@@ -53,6 +53,18 @@ object MessageFixtures {
             sends = CapsFlags.ALL_ENABLED,
             maxBlobBytes = Long.MAX_VALUE,
         ),
+        PolicySync(
+            revision = 1_785_450_000_000L,
+            send = CapsFlags.ALL_ENABLED,
+            receive = CapsFlags(text = true, image = false, file = true),
+        ),
+        PolicySync(
+            revision = 1L,
+            send = CapsFlags.ALL_DISABLED,
+            receive = CapsFlags.ALL_DISABLED,
+            paused = true,
+            maxBlobBytes = Long.MAX_VALUE,
+        ),
         ShizukuStartRequest,
         ShizukuStartResult(started = true),
         ShizukuStartResult(started = false, reason = "adbMissing"),
