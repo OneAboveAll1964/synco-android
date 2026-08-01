@@ -17,6 +17,8 @@ class ClipboardCaptureHub(
     private val suppression: SuppressionWindow,
     private val maxBlobBytes: () -> Long = { ProtocolConstants.DEFAULT_MAX_BLOB_BYTES },
     captureWaitMillis: () -> Long = { ClipSettle.DEFAULT_BUDGET_MILLIS },
+    private val staged: StagedBlobs = StagedBlobs.NONE,
+    private val repeats: RepeatCaptureGuard = RepeatCaptureGuard(),
 ) : ClipboardCapture {
 
     private val emissions = MutableSharedFlow<CapturedClip>(
@@ -46,38 +48,18 @@ class ClipboardCaptureHub(
                 return false
             }
             val candidate = reader.read(UUID.randomUUID().toString(), maxBlobBytes()) ?: return false
-            if (suppression.consume(candidate.hash)) {
-                SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
-                return false
-            }
-            candidate
+            accept(candidate, reader.clipTimestamp()) ?: return false
         }
-        SyncoLog.clipboard.info(
-            "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
-                "and ${snapshot.transfers.size} blob(s)",
-        )
-        markObserved(route)
-        emissions.emit(CapturedClip(snapshot, route))
-        return true
+        return publish(snapshot, route)
     }
 
     override suspend fun captureClip(clip: android.content.ClipData, route: CaptureRoute): Boolean {
         val snapshot = readLock.withLock {
             val candidate = reader.readClip(clip, UUID.randomUUID().toString(), maxBlobBytes())
                 ?: return false
-            if (suppression.consume(candidate.hash)) {
-                SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
-                return false
-            }
-            candidate
+            accept(candidate, stampOf(clip)) ?: return false
         }
-        SyncoLog.clipboard.info(
-            "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
-                "and ${snapshot.transfers.size} blob(s)",
-        )
-        markObserved(route)
-        emissions.emit(CapturedClip(snapshot, route))
-        return true
+        return publish(snapshot, route)
     }
 
     override fun clipTimestamp(): Long? = reader.clipTimestamp()
@@ -87,6 +69,36 @@ class ClipboardCaptureHub(
         this.connected.value = connected
         recomputeStatus()
     }
+
+    private fun accept(candidate: ClipboardSnapshot, stampMillis: Long?): ClipboardSnapshot? {
+        if (suppression.consume(candidate.hash)) {
+            SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
+            return discard(candidate)
+        }
+        if (repeats.isRepeat(candidate.hash, stampMillis)) {
+            SyncoLog.clipboard.debug { "ignored a second read of the copy we already captured" }
+            return discard(candidate)
+        }
+        return candidate
+    }
+
+    private fun discard(candidate: ClipboardSnapshot): ClipboardSnapshot? {
+        staged.discard(candidate)
+        return null
+    }
+
+    private suspend fun publish(snapshot: ClipboardSnapshot, route: CaptureRoute): Boolean {
+        SyncoLog.clipboard.info(
+            "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
+                "and ${snapshot.transfers.size} blob(s)",
+        )
+        markObserved(route)
+        emissions.emit(CapturedClip(snapshot, route))
+        return true
+    }
+
+    private fun stampOf(clip: android.content.ClipData): Long? =
+        runCatching { clip.description?.timestamp }.getOrNull()?.takeIf { it > 0 }
 
     private fun markObserved(route: CaptureRoute) {
         if (route == CaptureRoute.FOREGROUND_LISTENER) return

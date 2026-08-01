@@ -22,4 +22,5 @@
     <string name="transfer_receiving">Receiving %1$s of %2$s</string>
     <string name="transfer_sending">Sending %1$s of %2$s</string>
     <string name="transfer_percent">%1$d%%</string>
+    <string name="transfer_app_name">Synco</string>
 </resources>

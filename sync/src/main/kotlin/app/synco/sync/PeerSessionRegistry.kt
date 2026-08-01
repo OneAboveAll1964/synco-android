@@ -1,6 +1,7 @@
 package app.synco.sync
 
 import app.synco.discovery.DiscoveredPeer
+import app.synco.logging.SyncoLog
 import app.synco.protocol.DeviceId
 import app.synco.protocol.message.CloseReason
 import app.synco.storage.SyncPolicy
@@ -65,8 +66,7 @@ internal class PeerSessionRegistry(
     }
 
     suspend fun run(session: PeerSession, origin: SessionOrigin) {
-        val outcome = outcomeOf(session, origin)
-        if (outcome is SessionOutcome.Pairing) settle(outcome.result)
+        outcomeOf(session, origin)
     }
 
     override suspend fun claim(
@@ -96,12 +96,21 @@ internal class PeerSessionRegistry(
     } catch (cancellation: CancellationException) {
         throw cancellation
     } catch (failure: Exception) {
+        SyncoLog.session.warn("a peer session ended in failure", failure)
         null
     }
 
-    private suspend fun settle(result: PairingResult) {
-        val record = pairings.settle(result) ?: return
+    override suspend fun settlePairing(result: PairingResult) {
+        val record = pairings.settle(result)
+        if (record == null) {
+            SyncoLog.session.warn("pairing $result had no remembered descriptor, nothing was stored")
+            return
+        }
+        SyncoLog.session.info(
+            "stored ${record.deviceId.value} as ${if (record.isTrusted) "trusted" else "rejected"}",
+        )
         directory.of(record.deviceId).onTrusted(record)
         if (record.isTrusted) reconnect(record.deviceId)
     }
+
 }

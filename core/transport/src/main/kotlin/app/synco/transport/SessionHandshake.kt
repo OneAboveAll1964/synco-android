@@ -47,7 +47,7 @@ internal class SessionHandshake(
         return stored
     }
 
-    suspend fun authenticate(peerHello: Hello, peerStaticKey: ByteArray): EstablishedSession {
+    suspend fun authenticate(peerHello: Hello, peerStaticKey: ByteArray): HandshakeOutcome {
         val role = HandshakeRole.of(local.deviceId, peerHello.deviceId)
         val derived = Handshake(
             role = role,
@@ -59,25 +59,37 @@ internal class SessionHandshake(
             peerDeviceId = peerHello.deviceId,
         ).derive()
         frames.write(Auth(Base64Codec.encode(derived.confirmationTag)))
-        derived.requirePeerTag(confirmationTagOf(awaitAuth(peerHello)))
-        return EstablishedSession(
-            peer = PeerDescriptor(
-                deviceId = peerHello.deviceId,
-                displayName = peerHello.displayName,
-                platform = peerHello.platform,
-                staticPublicKey = peerStaticKey,
+        val auth = when (val step = awaitAuth()) {
+            is AuthStep.PeerWantsPairing -> return HandshakeOutcome.Unpaired(step.request)
+            is AuthStep.Confirmed -> step.auth
+        }
+        derived.requirePeerTag(confirmationTagOf(auth))
+        return HandshakeOutcome.Established(
+            EstablishedSession(
+                peer = PeerDescriptor(
+                    deviceId = peerHello.deviceId,
+                    displayName = peerHello.displayName,
+                    platform = peerHello.platform,
+                    staticPublicKey = peerStaticKey,
+                ),
+                role = role,
+                ciphers = derived.ciphers(),
             ),
-            role = role,
-            ciphers = derived.ciphers(),
         )
     }
 
-    private suspend fun awaitAuth(peerHello: Hello): Auth =
+    private suspend fun awaitAuth(): AuthStep =
         when (val message = ControlFrames.read(frames)) {
-            is Auth -> message
-            is PairRequest -> throw SyncoError.Unpaired(peerHello.deviceId)
+            is Auth -> AuthStep.Confirmed(message)
+            is PairRequest -> AuthStep.PeerWantsPairing(message)
             else -> throw ControlFrames.unexpected("auth", message)
         }
+
+    private sealed interface AuthStep {
+        data class Confirmed(val auth: Auth) : AuthStep
+
+        data class PeerWantsPairing(val request: PairRequest) : AuthStep
+    }
 
     private fun peerEphemeralKeyOf(peerHello: Hello): ByteArray =
         decodeFixed(peerHello.ephemeralPublicKey, HandshakeConstants.X25519_KEY_BYTES)

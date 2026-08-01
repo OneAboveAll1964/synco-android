@@ -63,6 +63,39 @@ class PeerSessionTest {
     }
 
     @Test
+    fun `a peer that was forgotten by the other side pairs again instead of stalling`() = runTest {
+        val link = TestLink()
+        val alice = SessionFixtures.device("Alice")
+        val bob = SessionFixtures.device("Bob", Platform.MACOS)
+        val alices = session(alice, link.left, SessionFixtures.trusting(bob))
+        val bobs = session(bob, link.right, SessionFixtures.untrusting())
+
+        val alicesRun = async { alices.run() }
+        val bobsRun = async { bobs.run() }
+
+        val alicesOutcome = alicesRun.await()
+        val bobsOutcome = bobsRun.await()
+        assertEquals(bob.deviceId, pairedPeer(alicesOutcome).deviceId)
+        assertEquals(alice.deviceId, pairedPeer(bobsOutcome).deviceId)
+        assertFalse(link.left.isEncrypted)
+    }
+
+    @Test
+    fun `the forgetful side pairing again works whichever end forgot`() = runTest {
+        val link = TestLink()
+        val alice = SessionFixtures.device("Alice")
+        val bob = SessionFixtures.device("Bob", Platform.MACOS)
+        val alices = session(alice, link.left, SessionFixtures.untrusting())
+        val bobs = session(bob, link.right, SessionFixtures.trusting(alice))
+
+        val alicesRun = async { alices.run() }
+        val bobsRun = async { bobs.run() }
+
+        assertEquals(bob.deviceId, pairedPeer(alicesRun.await()).deviceId)
+        assertEquals(alice.deviceId, pairedPeer(bobsRun.await()).deviceId)
+    }
+
+    @Test
     fun `a declining peer ends the pairing exchange without trust`() = runTest {
         val link = TestLink()
         val alice = SessionFixtures.device("Alice")

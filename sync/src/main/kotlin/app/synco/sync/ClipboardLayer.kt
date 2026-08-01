@@ -8,6 +8,7 @@ import app.synco.clipboard.ClipboardCaptureHub
 import app.synco.clipboard.ClipboardReader
 import app.synco.clipboard.ManualClips
 import app.synco.clipboard.ClipboardWriter
+import app.synco.clipboard.StagedBlobs
 import app.synco.clipboard.SuppressionWindow
 
 internal class ClipboardLayer(
@@ -26,7 +27,15 @@ internal class ClipboardLayer(
 
     private val reader = ClipboardReader(clipboardManager, transfers.blobs, transfers.metadata)
 
-    private val hub = ClipboardCaptureHub(reader, suppression, maxBlobBytes, captureWaitMillis)
+    private val hub = ClipboardCaptureHub(
+        reader = reader,
+        suppression = suppression,
+        maxBlobBytes = maxBlobBytes,
+        captureWaitMillis = captureWaitMillis,
+        staged = StagedBlobs { snapshot ->
+            snapshot.transfers.forEach { transfers.manager.abortOutgoing(it.transferId) }
+        },
+    )
 
     val capture: ClipboardCapture = hub
 

@@ -75,7 +75,11 @@ class PeerSession internal constructor(
         val peerHello = awaitHandshakeStep { handshake.exchangeHello() }
         val peerStaticKey = handshake.trustedKeyFor(peerHello)
             ?: return SessionOutcome.Pairing(pairing.run(peerHello))
-        val session = awaitHandshakeStep { handshake.authenticate(peerHello, peerStaticKey) }
+        val outcome = awaitHandshakeStep { handshake.authenticate(peerHello, peerStaticKey) }
+        if (outcome is HandshakeOutcome.Unpaired) {
+            return SessionOutcome.Pairing(pairing.run(peerHello, outcome.pendingRequest))
+        }
+        val session = (outcome as HandshakeOutcome.Established).session
         frames.upgrade(session.ciphers)
         descriptor = session.peer
         sink.trySend(SessionEvent.Established(session.peer, session.role))

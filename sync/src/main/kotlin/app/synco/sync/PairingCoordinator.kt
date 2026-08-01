@@ -1,5 +1,6 @@
 package app.synco.sync
 
+import app.synco.logging.SyncoLog
 import app.synco.protocol.DeviceId
 import app.synco.storage.TrustedPeer
 import app.synco.storage.TrustedPeerStore
@@ -21,8 +22,15 @@ class PairingCoordinator(
     override suspend fun approve(peer: PeerDescriptor): Boolean {
         requests.remember(peer)
         val known = trustedPeers.find(peer.deviceId)
-        if (known != null && known.rejected) return false
-        if (known != null && TrustedPeerRecords.holdsKeyOf(known, peer)) return true
+        if (known != null && known.rejected) {
+            SyncoLog.session.info("refused ${peer.deviceId.value}, it was rejected before")
+            return false
+        }
+        if (known != null && TrustedPeerRecords.holdsKeyOf(known, peer)) {
+            SyncoLog.session.info("approved ${peer.deviceId.value} silently, its key is unchanged")
+            return true
+        }
+        SyncoLog.session.info("asking about a pairing request from ${peer.deviceId.value}")
         events.record(
             SyncEvent.of(SyncEvent.Kind.PAIRING_REQUESTED, peer.deviceId, peer.fingerprint.grouped),
         )
@@ -30,6 +38,7 @@ class PairingCoordinator(
     }
 
     fun decide(deviceId: DeviceId, approved: Boolean) {
+        SyncoLog.session.info("the user ${if (approved) "approved" else "rejected"} ${deviceId.value}")
         requests.settle(deviceId, approved)
     }
 

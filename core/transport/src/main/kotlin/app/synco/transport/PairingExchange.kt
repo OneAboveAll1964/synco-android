@@ -7,19 +7,23 @@ import app.synco.protocol.ProtocolConstants
 import app.synco.protocol.SyncoError
 import app.synco.protocol.encoding.Base64Codec
 import app.synco.protocol.message.ControlMessage
+import app.synco.protocol.message.Auth
 import app.synco.protocol.message.Hello
 import app.synco.protocol.message.PairRequest
 import app.synco.protocol.message.PairResponse
 import kotlinx.coroutines.withTimeoutOrNull
+
+private const val MAX_SKIPPED_FRAMES = 8
 
 internal class PairingExchange(
     private val local: LocalDevice,
     private val frames: FramedConnection,
     private val approval: PairingApproval,
 ) {
-    suspend fun run(peerHello: Hello): PairingResult {
+    suspend fun run(peerHello: Hello, pendingRequest: PairRequest? = null): PairingResult {
         frames.write(localPairRequest())
-        val peer = descriptorOf(awaitPairRequest(), peerHello.deviceId)
+        val request = pendingRequest ?: awaitPairRequest()
+        val peer = descriptorOf(request, peerHello.deviceId)
         val approved = approval.approve(peer)
         frames.write(
             PairResponse(
@@ -46,16 +50,31 @@ internal class PairingExchange(
     )
 
     private suspend fun awaitPairRequest(): PairRequest {
-        val message = awaitMessage()
-        return message as? PairRequest ?: throw ControlFrames.unexpected("pairRequest", message)
+        repeat(MAX_SKIPPED_FRAMES) {
+            when (val message = awaitMessage()) {
+                is PairRequest -> return message
+                is Auth, is Hello -> Unit
+                else -> throw ControlFrames.unexpected("pairRequest", message)
+            }
+        }
+        throw SyncoError.Timeout("the peer never sent a pairRequest")
     }
 
     private suspend fun awaitPairResponse(expected: DeviceId): PairResponse {
-        val message = awaitMessage()
-        val response = message as? PairResponse
-            ?: throw ControlFrames.unexpected("pairResponse", message)
-        if (response.deviceId != expected) throw SyncoError.DidMismatch(response.deviceId.value)
-        return response
+        repeat(MAX_SKIPPED_FRAMES) {
+            when (val message = awaitMessage()) {
+                is PairResponse -> {
+                    if (message.deviceId != expected) {
+                        throw SyncoError.DidMismatch(message.deviceId.value)
+                    }
+                    return message
+                }
+
+                is Auth, is Hello, is PairRequest -> Unit
+                else -> throw ControlFrames.unexpected("pairResponse", message)
+            }
+        }
+        throw SyncoError.Timeout("the peer never sent a pairResponse")
     }
 
     private suspend fun awaitMessage(): ControlMessage =

@@ -16,14 +16,16 @@ class TransferNotifications(private val context: Context) {
     private val shown = mutableSetOf<Int>()
 
     fun createChannel() {
+        manager?.deleteNotificationChannel(LEGACY_CHANNEL_ID)
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.transfer_channel_name),
-            NotificationManager.IMPORTANCE_LOW,
+            NotificationManager.IMPORTANCE_HIGH,
         ).apply {
             description = context.getString(R.string.transfer_channel_description)
             setShowBadge(false)
             enableVibration(false)
+            enableLights(false)
             setSound(null, null)
             lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         }
@@ -59,9 +61,12 @@ class TransferNotifications(private val context: Context) {
             .setContentIntent(intents.openApp())
             .setProgress(PERCENT_TOTAL, percent, progress.totalBytes <= 0)
             .setOngoing(true)
-            .setSilent(true)
+            .setAutoCancel(false)
             .setOnlyAlertOnce(true)
+            .setSilent(true)
+            .setDefaults(0)
             .setLocalOnly(true)
+            .setGroup(GROUP_KEY)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
         if (LiveUpdateSupport.isAvailable(manager)) {
@@ -71,7 +76,9 @@ class TransferNotifications(private val context: Context) {
     }
 
     private companion object {
-        const val CHANNEL_ID = "synco_transfers"
+        const val CHANNEL_ID = "synco_transfers_pill"
+        const val LEGACY_CHANNEL_ID = "synco_transfers"
+        const val GROUP_KEY = "synco_transfers"
         const val PERCENT_TOTAL = 100
     }
 }
