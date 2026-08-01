@@ -32,6 +32,9 @@ class ShizukuCaptureLoop(
         ShizukuBinderWatch.observe(::refresh)
         while (true) {
             val current = availability.state(clipboard::read)
+            if (current != stateFlow.value) {
+                SyncoLog.clipboard.info("Shizuku capture is $current")
+            }
             stateFlow.value = current
             val chosen = tuning.mode() == CaptureMode.SHIZUKU
             if (!chosen) {
@@ -48,7 +51,11 @@ class ShizukuCaptureLoop(
     }
 
     private suspend fun pollOnce() {
-        val clip = clipboard.primaryClip() ?: return
+        val clip = clipboard.primaryClip()
+        if (clip == null) {
+            SyncoLog.clipboard.debug { "Shizuku read gave no clip" }
+            return
+        }
         val fingerprint = fingerprintOf(clip)
         if (fingerprint == lastFingerprint) return
         lastFingerprint = fingerprint

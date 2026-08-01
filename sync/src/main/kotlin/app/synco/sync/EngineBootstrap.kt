@@ -36,6 +36,7 @@ internal class EngineBootstrap(
         val endpoint = endpoints.create(local)
         val registry = PeerSessionRegistry(
             local.deviceId,
+            local.platform,
             routers,
             endpoint,
             state,

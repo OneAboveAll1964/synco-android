@@ -21,7 +21,7 @@ fun ShizukuOverAdbAction(
     onRequest: (DeviceId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state == ShizukuState.READY || helper == null) return
+    if (state == ShizukuState.READY || state == ShizukuState.NOT_INSTALLED || helper == null) return
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         TextButton(
             enabled = !pending,

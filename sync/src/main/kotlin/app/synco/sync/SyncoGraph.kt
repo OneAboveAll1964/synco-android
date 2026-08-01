@@ -97,6 +97,7 @@ class SyncoGraph private constructor(
                     manual = clipboard.manual,
                     events = state,
                     reports = state,
+                    rows = state,
                 ),
                 state = state.state,
                 settings = storage.settings,

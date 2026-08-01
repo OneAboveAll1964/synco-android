@@ -7,6 +7,7 @@ import app.synco.clipboard.CaptureRoute
 import app.synco.clipboard.ClipboardCapture
 import app.synco.clipboard.CopyIntentDetector
 import app.synco.logging.SyncoLog
+import app.synco.sync.CaptureTuningHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,9 +28,12 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
 
     private var detector: CopyIntentDetector? = null
 
+    private var tuning: CaptureTuningHolder? = null
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         val tuning = syncoGraphOrNull()?.captureTuning
+        this.tuning = tuning
         gate = FocusGate(this) { tuning?.focusTimeoutMillis() ?: DEFAULT_FOCUS_TIMEOUT }
         val keyboards = InputMethodPackages.of(this)
         detector = CopyIntentDetector(
@@ -45,6 +49,7 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val detector = detector ?: return
+        if (shizukuOwnsCapture()) return
         val signal = AccessibilitySignals.of(event) ?: return
         val triggered = detector.observe(signal)
         SyncoLog.clipboard.info(
@@ -55,6 +60,7 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
     }
 
     override suspend fun captureThroughFocus() {
+        if (shizukuOwnsCapture()) return
         val gate = gate ?: return
         val capture = capture ?: return
         val captured = captureLock.withLock {
@@ -63,6 +69,9 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
         }
         if (captured) detector?.captured()
     }
+
+    private fun shizukuOwnsCapture(): Boolean =
+        CaptureOwner.shizukuHasIt(tuning?.mode(), ShizukuStatus.state.value)
 
     override fun onInterrupt() = Unit
 

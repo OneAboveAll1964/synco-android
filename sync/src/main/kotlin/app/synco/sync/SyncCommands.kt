@@ -27,6 +27,7 @@ class SyncCommands internal constructor(
     private val manual: app.synco.clipboard.ManualClips,
     private val events: SyncEventSink,
     private val reports: ShizukuStartReports,
+    private val rows: TransferRows,
 ) {
     fun start() = fire { engine.start() }
 
@@ -91,6 +92,7 @@ class SyncCommands internal constructor(
 
     fun cancelTransfer(transferId: UUID) {
         transfers.cancel(transferId)
+        rows.dropTransfer(transferId)
     }
 
     fun sendText(value: String) = fire {

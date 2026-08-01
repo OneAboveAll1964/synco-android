@@ -3,6 +3,7 @@ package app.synco.sync
 import app.synco.discovery.DiscoveredPeer
 import app.synco.logging.SyncoLog
 import app.synco.protocol.DeviceId
+import app.synco.protocol.Platform
 import app.synco.protocol.message.CloseReason
 import app.synco.storage.SyncPolicy
 import app.synco.storage.TrustedPeer
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 
 internal class PeerSessionRegistry(
     private val selfDeviceId: DeviceId,
+    private val selfPlatform: Platform = Platform.ANDROID,
     routers: ClipRouterFactory,
     dialer: PeerDialer,
     events: SyncEventSink,
@@ -38,7 +40,10 @@ internal class PeerSessionRegistry(
         directory.all.firstOrNull { it.peerDeviceId == deviceId }?.router
 
     fun applyDiscovered(peers: List<DiscoveredPeer>) {
-        val byDeviceId = peers.filterNot { it.deviceId == selfDeviceId }.associateBy { it.deviceId }
+        val byDeviceId = peers
+            .filterNot { it.deviceId == selfDeviceId }
+            .filter { PeerPlatformRule.pairs(selfPlatform, it.platform) }
+            .associateBy { it.deviceId }
         byDeviceId.forEach { (deviceId, peer) -> directory.of(deviceId).onDiscovered(peer) }
         directory.all
             .filterNot { it.peerDeviceId in byDeviceId }

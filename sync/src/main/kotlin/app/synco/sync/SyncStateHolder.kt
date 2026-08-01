@@ -1,12 +1,13 @@
 package app.synco.sync
 
 import app.synco.transfer.TransferProgress
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports {
+class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports, TransferRows {
 
     private val current = MutableStateFlow(SyncState.IDLE)
 
@@ -42,6 +43,12 @@ class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports {
 
     fun publishPendingPairings(pending: List<PendingPairing>) {
         current.update { it.copy(pendingPairings = pending) }
+    }
+
+    override fun dropTransfer(transferId: UUID) {
+        current.update { snapshot ->
+            snapshot.copy(transfers = snapshot.transfers.filterNot { it.transferId == transferId })
+        }
     }
 
     fun recordTransfer(progress: TransferProgress) {

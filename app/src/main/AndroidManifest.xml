@@ -16,6 +16,9 @@
 
     <queries>
         <package android:name="moe.shizuku.privileged.api" />
+        <package android:name="moe.shizuku.manager" />
+        <provider android:authorities="moe.shizuku.privileged.api.shizuku" />
+        <provider android:authorities="moe.shizuku.manager.shizuku" />
     </queries>
 
     <application

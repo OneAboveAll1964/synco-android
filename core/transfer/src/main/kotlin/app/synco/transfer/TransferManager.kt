@@ -22,6 +22,7 @@ class TransferManager(
 
     private val incoming = ConcurrentHashMap<UUID, IncomingTransfer>()
     private val outgoing = ConcurrentHashMap<UUID, OutgoingTransfer>()
+    private val unfinished = ConcurrentHashMap.newKeySet<UUID>()
     private val reporter = TransferProgressReporter()
 
     val progress: SharedFlow<TransferProgress> get() = reporter.progress
@@ -109,7 +110,10 @@ class TransferManager(
     }
 
     fun stream(transfer: OutgoingTransfer): Flow<BlobChunk> = transfer.chunks()
-        .onStart { reporter.outgoing(transfer, TransferProgress.State.STARTED, 0L) }
+        .onStart {
+            unfinished += transfer.transferId
+            reporter.outgoing(transfer, TransferProgress.State.STARTED, 0L)
+        }
         .transformWhile { chunk ->
             val live = isOutgoingLive(transfer.transferId)
             if (live) {
@@ -121,6 +125,7 @@ class TransferManager(
         .onCompletion { error ->
             val broken = error != null || !isOutgoingLive(transfer.transferId)
             val state = if (broken) TransferProgress.State.FAILED else TransferProgress.State.COMPLETED
+            unfinished -= transfer.transferId
             reporter.outgoing(transfer, state, transfer.size)
         }
 
@@ -132,6 +137,8 @@ class TransferManager(
 
     fun abortOutgoing(transferId: UUID) = release(transferId)
 
+    fun isOutgoingUnfinished(transferId: UUID): Boolean = unfinished.contains(transferId)
+
     fun shutdown() {
         incoming.keys.toList().forEach { abortIncoming(it, TransferFailure.SHUTDOWN) }
         outgoing.keys.toList().forEach { release(it) }
@@ -139,7 +146,13 @@ class TransferManager(
     }
 
     private fun release(transferId: UUID) {
-        outgoing.remove(transferId)
+        val transfer = outgoing.remove(transferId)
+        if (transfer != null && unfinished.remove(transferId)) {
+            SyncoLog.transfer.warn("outgoing ${transfer.name} was released before it finished")
+            reporter.outgoing(transfer, TransferProgress.State.FAILED, 0L)
+        } else {
+            unfinished.remove(transferId)
+        }
         runCatching { storage.stagingFile(transferId).delete() }
     }
 

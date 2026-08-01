@@ -9,6 +9,21 @@ class ShizukuAvailability(context: Context) {
 
     private val packages = context.applicationContext.packageManager
 
+    private val install = ShizukuInstall(
+        hasPackage = { name ->
+            runCatching { packages.getPackageInfo(name, 0) }.isSuccess ||
+                runCatching { packages.getApplicationInfo(name, 0) }.isSuccess
+        },
+        hasProvider = { authority ->
+            runCatching { packages.resolveContentProvider(authority, 0) }.getOrNull() != null
+        },
+    )
+
+    @Volatile
+    private var everSawBinder = false
+
+    fun isInstalled(): Boolean = install.isInstalled(everSawBinder || isRunning())
+
     fun state(probe: () -> ShizukuRead): ShizukuState {
         if (!isRunning()) {
             return if (isInstalled()) ShizukuState.NOT_RUNNING else ShizukuState.NOT_INSTALLED
@@ -29,20 +44,12 @@ class ShizukuAvailability(context: Context) {
     fun shouldExplain(): Boolean =
         runCatching { Shizuku.shouldShowRequestPermissionRationale() }.getOrDefault(false)
 
-    private fun isInstalled(): Boolean = PACKAGES.any { candidate ->
-        runCatching {
-            packages.getPackageInfo(candidate, 0)
-            true
-        }.getOrDefault(false)
-    }
-
-    private fun isRunning(): Boolean = runCatching { Shizuku.pingBinder() }.getOrDefault(false)
+    private fun isRunning(): Boolean = runCatching { Shizuku.pingBinder() }
+        .getOrDefault(false)
+        .also { if (it) everSawBinder = true }
 
     private fun isGranted(): Boolean = runCatching {
         Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
     }.getOrDefault(false)
 
-    private companion object {
-        val PACKAGES = listOf("moe.shizuku.privileged.api", "moe.shizuku.manager")
-    }
 }
