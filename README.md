@@ -1,7 +1,7 @@
 <div style="width: 100%; text-align: center;">
   <img
     src="docs/icon-large.png"
-    style="width: 100%; max-width: 200px; height: auto;"
+    style="width: 100%; max-width: 100px; height: auto;"
     alt="Synco"
   >
 </div>
