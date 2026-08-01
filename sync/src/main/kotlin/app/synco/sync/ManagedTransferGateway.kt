@@ -35,6 +35,8 @@ class ManagedTransferGateway(private val transfers: TransferManager) : TransferG
         transfers.finishOutgoing(transferId)
     }
 
+    override fun liveTransferIds(): Set<UUID> = transfers.liveTransferIds()
+
     override fun cancel(transferId: UUID) {
         transfers.abortIncoming(transferId, TransferFailure.CANCELLED)
         transfers.abortOutgoing(transferId)

@@ -14,14 +14,13 @@ data class HomePreferences(
     val maxBlobBytes: Long,
     val captureTuning: CaptureTuning,
     val captureMode: CaptureMode,
-    val shizukuPollMillis: Long,
 ) {
     companion object {
         fun flowOf(settings: SettingsStore): Flow<HomePreferences> = combine(
             combine(settings.displayName, settings.launchOnBoot, settings.paused, ::Triple),
             settings.receivedFolder,
             settings.maxBlobBytes,
-            combine(settings.captureTuning, settings.captureMode, settings.shizukuPollMillis, ::Triple),
+            combine(settings.captureTuning, settings.captureMode, ::Pair),
         ) { device, receivedFolder, maxBlobBytes, capture ->
             HomePreferences(
                 displayName = device.first,
@@ -31,7 +30,6 @@ data class HomePreferences(
                 maxBlobBytes = maxBlobBytes,
                 captureTuning = capture.first,
                 captureMode = capture.second,
-                shizukuPollMillis = capture.third,
             )
         }
     }

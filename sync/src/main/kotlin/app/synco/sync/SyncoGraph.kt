@@ -25,7 +25,10 @@ class SyncoGraph private constructor(
     val clipboard: ClipboardCapture,
     val captureTuning: CaptureTuningHolder,
     val transferProgress: SharedFlow<TransferProgress>,
+    private val transfers: TransferGateway,
 ) {
+    fun liveTransferIds(): Set<java.util.UUID> = transfers.liveTransferIds()
+
     companion object {
         fun create(context: Context, scope: CoroutineScope): SyncoGraph {
             val application = context.applicationContext
@@ -105,6 +108,7 @@ class SyncoGraph private constructor(
                 clipboard = clipboard.capture,
                 captureTuning = captureTuning,
                 transferProgress = transfers.progress,
+                transfers = transfers.gateway,
             )
         }
     }

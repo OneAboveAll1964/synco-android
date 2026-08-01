@@ -5,7 +5,6 @@ import app.synco.protocol.ProtocolConstants
 import app.synco.shizuku.ShizukuState
 import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
-import app.synco.storage.ShizukuPollChoice
 import app.synco.sync.DeviceIdentity
 import app.synco.sync.PendingPairing
 import app.synco.sync.ShizukuStartReport
@@ -22,7 +21,6 @@ data class HomeUiState(
     val maxBlobBytes: Long,
     val captureTuning: CaptureTuning,
     val captureMode: CaptureMode,
-    val shizukuPollMillis: Long,
     val shizukuState: ShizukuState,
     val identity: DeviceIdentity?,
     val peers: List<PeerRow>,
@@ -49,7 +47,6 @@ data class HomeUiState(
             maxBlobBytes = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
             captureTuning = CaptureTuning.DEFAULT,
             captureMode = CaptureMode.DEFAULT,
-            shizukuPollMillis = ShizukuPollChoice.DEFAULT.millis,
             shizukuState = ShizukuState.NOT_INSTALLED,
             identity = null,
             peers = emptyList(),

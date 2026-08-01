@@ -108,10 +108,6 @@ class HomeViewModel(
         graph.commands.clearShizukuStart()
     }
 
-    override fun setShizukuPollMillis(millis: Long) {
-        graph.commands.setShizukuPollMillis(millis)
-    }
-
     override fun setDirection(deviceId: DeviceId, direction: SyncDirection) {
         graph.commands.setDirection(deviceId, direction)
     }

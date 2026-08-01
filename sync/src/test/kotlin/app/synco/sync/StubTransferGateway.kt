@@ -54,6 +54,8 @@ internal class StubTransferGateway : TransferGateway {
 
     override fun chunksOf(transfer: OutgoingTransfer): Flow<BlobChunk> = emptyFlow()
 
+    override fun liveTransferIds(): Set<UUID> = emptySet()
+
     override fun reportPeerProgress(transferId: UUID, receivedBytes: Long) = Unit
 
     override fun releaseOutgoing(transferId: UUID) {

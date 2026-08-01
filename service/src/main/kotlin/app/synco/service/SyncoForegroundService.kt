@@ -13,6 +13,7 @@ import app.synco.shizuku.ShizukuPermission
 import app.synco.shizuku.ShizukuStream
 import app.synco.sync.SyncState
 import app.synco.transfer.UriFallback
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SyncoForegroundService : LifecycleService() {
@@ -47,6 +48,12 @@ class SyncoForegroundService : LifecycleService() {
         lifecycleScope.launch { graph.state.collect(::publish) }
         watcher.start()
         lifecycleScope.launch { graph.transferProgress.collect(transferNotifications::publish) }
+        lifecycleScope.launch {
+            while (true) {
+                delay(NOTIFICATION_SWEEP_MILLIS)
+                transferNotifications.retainOnly(graph.liveTransferIds())
+            }
+        }
         lifecycleScope.launch { shizuku.run() }
         lifecycleScope.launch { ShizukuStatus.publish(shizuku.state) }
     }
@@ -67,6 +74,7 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        shizuku.stopWatching()
         UriFallback.clear()
         ShizukuPermission.stop()
         ShizukuBinderWatch.stop()
@@ -107,5 +115,9 @@ class SyncoForegroundService : LifecycleService() {
 
     private fun publish(state: SyncState) {
         if (syncing) notifications.update(state)
+    }
+
+    private companion object {
+        const val NOTIFICATION_SWEEP_MILLIS = 4_000L
     }
 }

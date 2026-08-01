@@ -64,6 +64,33 @@ class TransferManager(
 
     fun findIncoming(transferId: UUID): IncomingTransfer? = incoming[transferId]
 
+    fun liveTransferIds(): Set<UUID> = incoming.keys + outgoing.keys
+
+    suspend fun stageBytes(
+        transferId: UUID,
+        source: TransferSource,
+        peerMaxBlobBytes: Long = maxBlobBytes,
+    ): StagedBlob? = stager.stage(transferId, source, minOf(peerMaxBlobBytes, maxBlobBytes))
+
+    fun adoptStaged(
+        clipId: String,
+        staged: StagedBlob,
+        name: String,
+        mime: String,
+        transferId: UUID,
+    ): OutgoingTransfer {
+        val prepared = OutgoingTransfer.fromStaged(
+            resolver = resolver,
+            clipId = clipId,
+            staged = staged,
+            name = name,
+            mime = mime,
+            transferId = transferId,
+        )
+        outgoing[transferId] = prepared
+        return prepared
+    }
+
     suspend fun stageOutgoing(
         clipId: String,
         source: TransferSource,

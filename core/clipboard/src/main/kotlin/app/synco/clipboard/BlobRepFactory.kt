@@ -3,6 +3,7 @@ package app.synco.clipboard
 import android.net.Uri
 import app.synco.logging.SyncoLog
 import app.synco.protocol.message.ClipRep
+import app.synco.transfer.ContentMetadata
 import app.synco.transfer.ContentUriMetadata
 import app.synco.transfer.OutgoingTransfer
 import app.synco.transfer.TransferIds
@@ -10,6 +11,8 @@ import app.synco.transfer.TransferManager
 import app.synco.transfer.TransferSource
 import app.synco.transfer.TransferStorage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 class BlobRepFactory(
@@ -17,25 +20,31 @@ class BlobRepFactory(
     private val storage: TransferStorage,
     private val transfers: TransferManager,
 ) {
-    suspend fun fromUri(clipId: String, uri: Uri, maxBlobBytes: Long): PreparedRep? {
-        val resolved = metadata.resolve(uri)
-        if (resolved.hasKnownSize && resolved.size > maxBlobBytes) {
-            SyncoLog.clipboard.warn(
-                "dropped a ${resolved.mime} clip of ${resolved.size} bytes, over the cap of $maxBlobBytes",
+    suspend fun fromUri(clipId: String, uri: Uri, maxBlobBytes: Long): PreparedRep? = coroutineScope {
+        val transferId = TransferIds.newId()
+        val facts = async { metadata.resolve(uri) }
+        val bytes = async {
+            transfers.stageBytes(
+                transferId = transferId,
+                source = TransferSource.content(uri, ContentMetadata.unknown()),
+                peerMaxBlobBytes = maxBlobBytes,
             )
-            return null
         }
-        val transfer = transfers.stageOutgoing(
-            clipId = clipId,
-            source = TransferSource.content(uri, resolved),
-            peerMaxBlobBytes = maxBlobBytes,
-        )
-        if (transfer == null) {
+        val resolved = facts.await()
+        val staged = bytes.await()
+        if (staged == null) {
             SyncoLog.clipboard.warn("dropped a ${resolved.mime} clip, its blob could not be staged")
-            return null
+            return@coroutineScope null
         }
+        val transfer = transfers.adoptStaged(
+            clipId = clipId,
+            staged = staged,
+            name = resolved.name,
+            mime = resolved.mime,
+            transferId = transferId,
+        )
         SyncoLog.clipboard.info("captured a ${resolved.mime} clip of ${transfer.size} bytes")
-        return PreparedRep(repOf(transfer, resolved.isImage), transfer)
+        PreparedRep(repOf(transfer, resolved.isImage), transfer)
     }
 
     suspend fun fromBytes(

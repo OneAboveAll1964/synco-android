@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import app.synco.storage.CaptureMode
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -40,13 +41,12 @@ fun SettingsScreen(
             onModeChange = actions::setCaptureMode,
             onStartOverAdb = actions::requestShizukuStart,
         )
-        CaptureTuningCard(
-            tuning = state.captureTuning,
-            mode = state.captureMode,
-            shizukuPollMillis = state.shizukuPollMillis,
-            onTuningChange = actions::setCaptureTuning,
-            onShizukuPollChange = actions::setShizukuPollMillis,
-        )
+        if (state.captureMode != CaptureMode.SHIZUKU) {
+            CaptureTuningCard(
+                tuning = state.captureTuning,
+                onTuningChange = actions::setCaptureTuning,
+            )
+        }
         BlobSizeCard(
             maxBlobBytes = state.maxBlobBytes,
             onMaxBlobBytesChange = actions::setMaxBlobBytes,

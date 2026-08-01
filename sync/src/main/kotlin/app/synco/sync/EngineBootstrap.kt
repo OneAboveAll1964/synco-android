@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 internal class EngineBootstrap(
@@ -96,6 +97,12 @@ internal class EngineBootstrap(
         scope.launch { registry.views.collect { state.publishPeers(it) } }
         scope.launch { transfers.progress.collect { state.recordTransfer(it) } }
         scope.launch {
+            while (true) {
+                delay(TRANSFER_REAP_MILLIS)
+                state.reapStaleTransfers(transfers.liveTransferIds())
+            }
+        }
+        scope.launch {
             pairings.pending.collect { pending ->
                 state.publishPendingPairings(pending)
                 registry.applyPairing(pending.map { it.deviceId }.toSet())
@@ -106,5 +113,9 @@ internal class EngineBootstrap(
                 scope.launch { registry.run(session, SessionOrigin.ACCEPTED) }
             }
         }
+    }
+
+    private companion object {
+        const val TRANSFER_REAP_MILLIS = 5_000L
     }
 }

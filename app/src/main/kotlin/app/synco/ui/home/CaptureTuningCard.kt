@@ -22,15 +22,11 @@ import app.synco.storage.CaptureTuning
 import app.synco.storage.CaptureWaitChoice
 import app.synco.storage.FocusTimeoutChoice
 import app.synco.storage.GestureWindowChoice
-import app.synco.storage.ShizukuPollChoice
 
 @Composable
 fun CaptureTuningCard(
     tuning: CaptureTuning,
-    mode: CaptureMode,
-    shizukuPollMillis: Long,
     onTuningChange: (CaptureTuning) -> Unit,
-    onShizukuPollChange: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
@@ -47,39 +43,30 @@ fun CaptureTuningCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (mode == CaptureMode.SHIZUKU) {
-                ChoiceRow(
-                    label = stringResource(R.string.tuning_poll),
-                    options = ShizukuPollChoice.entries.map { MillisText.of(it.millis) to it.millis },
-                    selected = ShizukuPollChoice.nearest(shizukuPollMillis).millis,
-                    onSelect = onShizukuPollChange,
-                )
-            } else {
-                ChoiceRow(
-                    label = stringResource(R.string.tuning_wait),
-                    options = CaptureWaitChoice.entries.map { MillisText.of(it.millis) to it.millis },
-                    selected = CaptureWaitChoice.nearest(tuning.waitMillis).millis,
-                    onSelect = { onTuningChange(tuning.copy(waitMillis = it)) },
-                )
-                ChoiceRow(
-                    label = stringResource(R.string.tuning_focus),
-                    options = FocusTimeoutChoice.entries.map { MillisText.of(it.millis) to it.millis },
-                    selected = FocusTimeoutChoice.nearest(tuning.focusTimeoutMillis).millis,
-                    onSelect = { onTuningChange(tuning.copy(focusTimeoutMillis = it)) },
-                )
-                ChoiceRow(
-                    label = stringResource(R.string.tuning_window),
-                    options = GestureWindowChoice.entries.map { MillisText.of(it.millis) to it.millis },
-                    selected = GestureWindowChoice.nearest(tuning.gestureWindowMillis).millis,
-                    onSelect = { onTuningChange(tuning.copy(gestureWindowMillis = it)) },
-                )
-                ChoiceRow(
-                    label = stringResource(R.string.tuning_attempts),
-                    options = AttemptsChoice.entries.map { "${it.attempts}" to it.attempts.toLong() },
-                    selected = AttemptsChoice.nearest(tuning.attemptsPerGesture).attempts.toLong(),
-                    onSelect = { onTuningChange(tuning.copy(attemptsPerGesture = it.toInt())) },
-                )
-            }
+            ChoiceRow(
+                label = stringResource(R.string.tuning_wait),
+                options = CaptureWaitChoice.entries.map { MillisText.of(it.millis) to it.millis },
+                selected = CaptureWaitChoice.nearest(tuning.waitMillis).millis,
+                onSelect = { onTuningChange(tuning.copy(waitMillis = it)) },
+            )
+            ChoiceRow(
+                label = stringResource(R.string.tuning_focus),
+                options = FocusTimeoutChoice.entries.map { MillisText.of(it.millis) to it.millis },
+                selected = FocusTimeoutChoice.nearest(tuning.focusTimeoutMillis).millis,
+                onSelect = { onTuningChange(tuning.copy(focusTimeoutMillis = it)) },
+            )
+            ChoiceRow(
+                label = stringResource(R.string.tuning_window),
+                options = GestureWindowChoice.entries.map { MillisText.of(it.millis) to it.millis },
+                selected = GestureWindowChoice.nearest(tuning.gestureWindowMillis).millis,
+                onSelect = { onTuningChange(tuning.copy(gestureWindowMillis = it)) },
+            )
+            ChoiceRow(
+                label = stringResource(R.string.tuning_attempts),
+                options = AttemptsChoice.entries.map { "${it.attempts}" to it.attempts.toLong() },
+                selected = AttemptsChoice.nearest(tuning.attemptsPerGesture).attempts.toLong(),
+                onSelect = { onTuningChange(tuning.copy(attemptsPerGesture = it.toInt())) },
+            )
         }
     }
 }

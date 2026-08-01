@@ -19,5 +19,4 @@ internal object StorageKeys {
     val CAPTURE_ATTEMPTS = intPreferencesKey("capture_attempts")
     val GESTURE_WINDOW_MILLIS = longPreferencesKey("gesture_window_millis")
     val CAPTURE_MODE = stringPreferencesKey("capture_mode")
-    val SHIZUKU_POLL_MILLIS = longPreferencesKey("shizuku_poll_millis")
 }

@@ -41,6 +41,49 @@ class StuckTransferTest {
     }
 
     @Test
+    fun `a row whose updates stopped is reaped`() = runTest {
+        val holder = SyncStateHolder()
+        holder.recordTransfer(progress(TransferProgress.State.RUNNING), atMillis = 1_000)
+
+        holder.reapStaleTransfers(liveIds = setOf(transferId), atMillis = 1_000 + 20_001)
+
+        assertTrue(holder.state.value.transfers.isEmpty())
+    }
+
+    @Test
+    fun `a row that is still being updated survives reaping`() = runTest {
+        val holder = SyncStateHolder()
+        holder.recordTransfer(progress(TransferProgress.State.RUNNING), atMillis = 1_000)
+
+        holder.reapStaleTransfers(liveIds = setOf(transferId), atMillis = 1_000 + 5_000)
+
+        assertEquals(listOf(transferId), holder.state.value.transfers.map { it.transferId })
+    }
+
+    @Test
+    fun `a new transfer sweeps away an abandoned one`() = runTest {
+        val holder = SyncStateHolder()
+        holder.recordTransfer(progress(TransferProgress.State.RUNNING), atMillis = 1_000)
+
+        holder.recordTransfer(
+            progress(TransferProgress.State.RUNNING).copy(transferId = UUID.randomUUID()),
+            atMillis = 1_000 + 20_001,
+        )
+
+        assertEquals(1, holder.state.value.transfers.size)
+    }
+
+    @Test
+    fun `a row for a transfer the manager forgot is swept away`() = runTest {
+        val holder = SyncStateHolder()
+        holder.recordTransfer(progress(TransferProgress.State.RUNNING), atMillis = 1_000)
+
+        holder.reapStaleTransfers(liveIds = emptySet(), atMillis = 1_100)
+
+        assertTrue(holder.state.value.transfers.isEmpty())
+    }
+
+    @Test
     fun `dropping an unknown transfer leaves the others alone`() = runTest {
         val holder = SyncStateHolder()
         holder.recordTransfer(progress(TransferProgress.State.RUNNING))

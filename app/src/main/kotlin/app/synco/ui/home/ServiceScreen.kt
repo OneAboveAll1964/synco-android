@@ -40,7 +40,13 @@ fun ServiceScreen(
             onLaunchOnBootChange = actions::setLaunchOnBoot,
         )
         Text(
-            text = stringResource(clipboardStatusTextRes(state.clipboardStatus)),
+            text = stringResource(
+                captureStatusTextRes(
+                    mode = state.captureMode,
+                    shizuku = state.shizukuState,
+                    accessibility = state.clipboardStatus,
+                ),
+            ),
             style = MaterialTheme.typography.bodySmall,
         )
         if (permissions.hasBlockers || state.problem != null) {

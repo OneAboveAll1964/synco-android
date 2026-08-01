@@ -15,7 +15,6 @@ interface SettingsStore {
 
     val captureMode: Flow<CaptureMode>
 
-    val shizukuPollMillis: Flow<Long>
 
     val paused: Flow<Boolean>
 
@@ -37,7 +36,6 @@ interface SettingsStore {
 
     suspend fun setCaptureMode(mode: CaptureMode)
 
-    suspend fun setShizukuPollMillis(millis: Long)
 
     suspend fun setPaused(paused: Boolean)
 

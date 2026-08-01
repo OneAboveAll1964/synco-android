@@ -16,8 +16,6 @@ internal class SettingsSnapshot(preferences: Preferences, fallbackDisplayName: S
 
     val captureMode: CaptureMode = CaptureMode.parse(preferences[StorageKeys.CAPTURE_MODE])
 
-    val shizukuPollMillis: Long = preferences[StorageKeys.SHIZUKU_POLL_MILLIS]
-        ?: ShizukuPollChoice.DEFAULT.millis
 
     val captureTuning: CaptureTuning = CaptureTuning(
         waitMillis = preferences[StorageKeys.CAPTURE_WAIT_MILLIS] ?: CaptureWaitChoice.DEFAULT.millis,

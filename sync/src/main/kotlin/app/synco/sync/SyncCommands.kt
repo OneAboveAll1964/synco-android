@@ -45,8 +45,6 @@ class SyncCommands internal constructor(
 
     fun setCaptureMode(mode: CaptureMode) = fire { settings.setCaptureMode(mode) }
 
-    fun setShizukuPollMillis(millis: Long) = fire { settings.setShizukuPollMillis(millis) }
-
     fun setDisplayName(displayName: String) = fire {
         settings.setDisplayName(displayName)
         if (engine.isRunning) engine.restart()

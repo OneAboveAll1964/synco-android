@@ -25,7 +25,6 @@ interface HomeActions {
 
     fun setCaptureMode(mode: CaptureMode)
 
-    fun setShizukuPollMillis(millis: Long)
 
     fun setDirection(deviceId: DeviceId, direction: SyncDirection)
 

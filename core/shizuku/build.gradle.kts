@@ -4,6 +4,9 @@ plugins {
 
 android {
     namespace = "app.synco.shizuku"
+    buildFeatures {
+        aidl = true
+    }
 }
 
 dependencies {

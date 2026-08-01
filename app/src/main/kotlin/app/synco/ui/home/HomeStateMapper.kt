@@ -27,7 +27,6 @@ internal object HomeStateMapper {
         maxBlobBytes = preferences.maxBlobBytes,
         captureTuning = preferences.captureTuning,
         captureMode = preferences.captureMode,
-        shizukuPollMillis = preferences.shizukuPollMillis,
         identity = state.identity,
         peers = peerRows(state, policies, trusted),
         transfers = state.transfers,

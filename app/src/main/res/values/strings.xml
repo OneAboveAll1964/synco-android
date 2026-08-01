@@ -72,6 +72,7 @@
 
     <string name="clipboard_status_service_disabled">Background clipboard capture is off. Turn on Synco clipboard access so copies made in other apps reach your Mac.</string>
     <string name="clipboard_status_awaiting_copy">Clipboard access is on. Copy something in any app and Synco will pick it up.</string>
+    <string name="clipboard_status_shizuku_working">Shizuku is reading the clipboard. Copy anything and Synco picks it up straight away.</string>
     <string name="clipboard_status_working">Background clipboard capture is working.</string>
     <string name="permission_battery_title">Exempt Synco from battery optimisation</string>
     <string name="permission_battery_explanation">Battery optimisation can suspend the network connection while the screen is off, which makes copies arrive minutes late or not at all.</string>
@@ -113,7 +114,6 @@
     <string name="tuning_focus">How long to wait for focus</string>
     <string name="tuning_window">How long a tap stays armed</string>
     <string name="tuning_attempts">Reads per tap</string>
-    <string name="tuning_poll">How often to check</string>
     <string name="shizuku_grant">Grant Synco access in Shizuku</string>
     <string name="shizuku_open">Open Shizuku</string>
     <string name="shizuku_get">Get Shizuku</string>

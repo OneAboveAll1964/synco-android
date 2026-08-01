@@ -27,6 +27,8 @@ interface TransferGateway {
 
     fun reportPeerProgress(transferId: UUID, receivedBytes: Long)
 
+    fun liveTransferIds(): Set<UUID>
+
     fun cancel(transferId: UUID)
 
     fun shutdown()

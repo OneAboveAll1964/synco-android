@@ -51,13 +51,28 @@ class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports, Tr
         }
     }
 
-    fun recordTransfer(progress: TransferProgress) {
-        val view = TransferView.of(progress)
+    fun recordTransfer(progress: TransferProgress, atMillis: Long = System.currentTimeMillis()) {
+        val view = TransferView.of(progress, atMillis)
         current.update { snapshot ->
-            val others = snapshot.transfers.filterNot { it.transferId == view.transferId }
+            val others = snapshot.transfers
+                .filterNot { it.transferId == view.transferId }
+                .filter { isFresh(it, atMillis) }
             snapshot.copy(transfers = if (view.isFinished) others else others + view)
         }
     }
+
+    fun reapStaleTransfers(
+        liveIds: Set<UUID> = emptySet(),
+        atMillis: Long = System.currentTimeMillis(),
+    ) {
+        current.update { snapshot ->
+            val live = snapshot.transfers.filter { it.transferId in liveIds && isFresh(it, atMillis) }
+            if (live.size == snapshot.transfers.size) snapshot else snapshot.copy(transfers = live)
+        }
+    }
+
+    private fun isFresh(view: TransferView, atMillis: Long): Boolean =
+        atMillis - view.updatedAtMillis < STALE_TRANSFER_MILLIS
 
     override fun record(event: SyncEvent) {
         current.update { state ->
@@ -88,6 +103,7 @@ class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports, Tr
     }
 
     private companion object {
+        const val STALE_TRANSFER_MILLIS = 20_000L
         const val HISTORY_LIMIT = 60
     }
 }

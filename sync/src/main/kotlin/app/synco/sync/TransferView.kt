@@ -10,6 +10,7 @@ data class TransferView(
     val state: TransferProgress.State,
     val bytesTransferred: Long,
     val totalBytes: Long,
+    val updatedAtMillis: Long = 0L,
 ) {
     val fraction: Float
         get() = if (totalBytes > 0) (bytesTransferred.toDouble() / totalBytes).toFloat() else 0f
@@ -18,13 +19,15 @@ data class TransferView(
         get() = state == TransferProgress.State.COMPLETED || state == TransferProgress.State.FAILED
 
     companion object {
-        fun of(progress: TransferProgress): TransferView = TransferView(
+        fun of(progress: TransferProgress, atMillis: Long = System.currentTimeMillis()): TransferView =
+            TransferView(
             transferId = progress.transferId,
             name = progress.name,
             direction = progress.direction,
             state = progress.state,
             bytesTransferred = progress.bytesTransferred,
             totalBytes = progress.totalBytes,
+            updatedAtMillis = atMillis,
         )
     }
 }

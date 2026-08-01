@@ -35,9 +35,6 @@ class DataStoreSettingsStore internal constructor(
     override val captureMode: Flow<CaptureMode> =
         snapshots.map { it.captureMode }.distinctUntilChanged()
 
-    override val shizukuPollMillis: Flow<Long> =
-        snapshots.map { it.shizukuPollMillis }.distinctUntilChanged()
-
     override val paused: Flow<Boolean> =
         snapshots.map { it.paused }.distinctUntilChanged()
 
@@ -71,10 +68,6 @@ class DataStoreSettingsStore internal constructor(
 
     override suspend fun setCaptureMode(mode: CaptureMode) = write { preferences ->
         preferences[StorageKeys.CAPTURE_MODE] = mode.wireValue
-    }
-
-    override suspend fun setShizukuPollMillis(millis: Long) = write { preferences ->
-        preferences[StorageKeys.SHIZUKU_POLL_MILLIS] = millis
     }
 
     override suspend fun setCaptureTuning(tuning: CaptureTuning) = write { preferences ->

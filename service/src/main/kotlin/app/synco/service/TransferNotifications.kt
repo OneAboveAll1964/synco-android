@@ -47,6 +47,11 @@ class TransferNotifications(private val context: Context) {
         shown.toList().forEach(::dismiss)
     }
 
+    fun retainOnly(liveIds: Set<java.util.UUID>) {
+        val live = liveIds.map { it.hashCode() }.toSet()
+        shown.toList().filterNot { it in live }.forEach(::dismiss)
+    }
+
     private fun dismiss(id: Int) {
         if (!shown.remove(id)) return
         manager?.cancel(id)
