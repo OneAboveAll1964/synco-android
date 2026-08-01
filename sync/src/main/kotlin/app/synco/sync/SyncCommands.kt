@@ -3,6 +3,8 @@ package app.synco.sync
 import app.synco.clipboard.CaptureRoute
 import app.synco.clipboard.ClipboardCapture
 import app.synco.protocol.DeviceId
+import app.synco.storage.CaptureMode
+import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
 import app.synco.storage.IdentityStore
 import app.synco.storage.PeerDirections
@@ -35,7 +37,11 @@ class SyncCommands internal constructor(
 
     fun setMaxBlobBytes(bytes: Long) = fire { settings.setMaxBlobBytes(bytes) }
 
-    fun setCaptureWaitMillis(millis: Long) = fire { settings.setCaptureWaitMillis(millis) }
+    fun setCaptureTuning(tuning: CaptureTuning) = fire { settings.setCaptureTuning(tuning) }
+
+    fun setCaptureMode(mode: CaptureMode) = fire { settings.setCaptureMode(mode) }
+
+    fun setShizukuPollMillis(millis: Long) = fire { settings.setShizukuPollMillis(millis) }
 
     fun setDisplayName(displayName: String) = fire {
         settings.setDisplayName(displayName)

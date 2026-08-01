@@ -95,4 +95,23 @@
     <string name="received_folder_clear">Clear</string>
     <string name="blob_size_title">Largest file to accept</string>
     <string name="blob_size_subtitle">Anything bigger than this is refused in both directions. Your Mac has its own limit, and the smaller of the two wins.</string>
+    <string name="about_title">About Synco</string>
+    <string name="about_body">Synco keeps this phone and your Mac sharing one clipboard over your local network. Nothing leaves your network and there is no account.</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_author_link">github.com/OneAboveAll1964</string>
+    <string name="capture_mode_title">How Synco reads your clipboard</string>
+    <string name="capture_mode_subtitle">Accessibility works on any phone but has to flash focus for an instant on each copy, so it can occasionally miss one. Shizuku is more reliable and never touches focus, but you have to start Shizuku after each reboot.</string>
+    <string name="capture_mode_accessibility">Accessibility</string>
+    <string name="capture_mode_shizuku">Shizuku</string>
+    <string name="shizuku_not_installed">Shizuku is not installed, so Synco is using accessibility instead.</string>
+    <string name="shizuku_not_running">Shizuku is installed but not running, so Synco is using accessibility instead. Start Shizuku and come back.</string>
+    <string name="shizuku_permission_denied">Shizuku has not granted Synco permission yet, so Synco is using accessibility instead.</string>
+    <string name="shizuku_ready">Shizuku is connected. Copies are read without touching focus.</string>
+    <string name="tuning_title">Capture tuning</string>
+    <string name="tuning_subtitle">Raise these if copies are missed on a slower phone. Lower them if Synco feels intrusive.</string>
+    <string name="tuning_wait">How long to wait for the clipboard</string>
+    <string name="tuning_focus">How long to wait for focus</string>
+    <string name="tuning_window">How long a tap stays armed</string>
+    <string name="tuning_attempts">Reads per tap</string>
+    <string name="tuning_poll">How often to check</string>
 </resources>

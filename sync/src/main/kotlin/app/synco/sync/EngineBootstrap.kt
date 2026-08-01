@@ -34,7 +34,15 @@ internal class EngineBootstrap(
         state.clear(SyncProblem.IDENTITY_UNREADABLE)
         val scope = childScope(parent)
         val endpoint = endpoints.create(local)
-        val registry = PeerSessionRegistry(local.deviceId, routers, endpoint, state, scope, pairings)
+        val registry = PeerSessionRegistry(
+            local.deviceId,
+            routers,
+            endpoint,
+            state,
+            scope,
+            pairings,
+            PolicyExchange(local.deviceId, settings),
+        )
         try {
             val port = endpoint.bind()
             state.setIdentity(DeviceIdentity.of(local))

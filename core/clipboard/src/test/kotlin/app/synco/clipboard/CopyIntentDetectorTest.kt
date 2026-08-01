@@ -6,7 +6,12 @@ import org.junit.Test
 
 class CopyIntentDetectorTest {
 
-    private fun detector() = CopyIntentDetector(ownPackageName = OWN, excludedPackages = { setOf(IME) })
+    private fun detector(attempts: Int = 2) =
+        CopyIntentDetector(
+            ownPackageName = OWN,
+            excludedPackages = { setOf(IME) },
+            attemptsPerGesture = { attempts },
+        )
 
     private fun click(atMillis: Long, packageName: String = OTHER) =
         CopySignal(CopySignalKind.CLICK, atMillis, packageName)

@@ -4,6 +4,7 @@ import app.synco.protocol.framing.BlobChunk
 import app.synco.protocol.message.Caps
 import app.synco.protocol.message.CloseReason
 import app.synco.protocol.message.Envelope
+import app.synco.protocol.message.PolicySync
 import app.synco.transport.PeerSession
 
 internal class SessionBinding(
@@ -12,7 +13,11 @@ internal class SessionBinding(
     private val router: ClipRouter,
 ) {
     suspend fun receive(envelope: Envelope) {
-        if (envelope is Caps) connection.onPeerCaps(envelope) else router.receive(envelope)
+        when (envelope) {
+            is Caps -> connection.onPeerCaps(envelope)
+            is PolicySync -> connection.onPeerPolicy(envelope)
+            else -> router.receive(envelope)
+        }
     }
 
     suspend fun receive(chunk: BlobChunk) {

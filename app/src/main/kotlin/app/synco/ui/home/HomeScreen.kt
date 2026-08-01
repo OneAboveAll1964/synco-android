@@ -60,6 +60,18 @@ fun HomeScreen(
             receivedFolder = state.receivedFolder,
             onFolderChosen = actions::setReceivedFolder,
         )
+        CaptureModeCard(
+            mode = state.captureMode,
+            shizukuState = state.shizukuState,
+            onModeChange = actions::setCaptureMode,
+        )
+        CaptureTuningCard(
+            tuning = state.captureTuning,
+            mode = state.captureMode,
+            shizukuPollMillis = state.shizukuPollMillis,
+            onTuningChange = actions::setCaptureTuning,
+            onShizukuPollChange = actions::setShizukuPollMillis,
+        )
         BlobSizeCard(
             maxBlobBytes = state.maxBlobBytes,
             onMaxBlobBytesChange = actions::setMaxBlobBytes,
@@ -68,5 +80,6 @@ fun HomeScreen(
             TransferList(transfers = state.transfers, onCancel = actions::cancelTransfer)
         }
         PeerList(peers = state.peers, actions = actions)
+        AboutCard()
     }
 }

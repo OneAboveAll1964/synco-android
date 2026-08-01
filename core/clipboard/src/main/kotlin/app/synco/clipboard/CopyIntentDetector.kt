@@ -3,9 +3,9 @@ package app.synco.clipboard
 class CopyIntentDetector(
     private val ownPackageName: String?,
     private val excludedPackages: () -> Set<String> = ::emptySet,
-    private val gestureWindowMillis: Long = DEFAULT_GESTURE_WINDOW_MILLIS,
+    private val gestureWindowMillis: () -> Long = { DEFAULT_GESTURE_WINDOW_MILLIS },
     private val minIntervalMillis: Long = DEFAULT_MIN_INTERVAL_MILLIS,
-    private val attemptsPerGesture: Int = DEFAULT_ATTEMPTS_PER_GESTURE,
+    private val attemptsPerGesture: () -> Int = { DEFAULT_ATTEMPTS_PER_GESTURE },
 ) {
     private var armedAtMillis: Long? = null
 
@@ -27,14 +27,14 @@ class CopyIntentDetector(
     private fun arm(signal: CopySignal): Boolean {
         if (isOurs(signal) || isExcluded(signal)) return false
         armedAtMillis = signal.timestampMillis
-        attemptsLeft = attemptsPerGesture
+        attemptsLeft = attemptsPerGesture()
         return false
     }
 
     private fun onWindowStateChanged(signal: CopySignal): Boolean {
         if (isOurs(signal) || isExcluded(signal)) return false
         val armed = armedAtMillis ?: return false
-        if (signal.timestampMillis - armed !in 0..gestureWindowMillis) return false
+        if (signal.timestampMillis - armed !in 0..gestureWindowMillis()) return false
         if (attemptsLeft <= 0) return false
         if (tooSoon(signal.timestampMillis)) return false
         attemptsLeft -= 1

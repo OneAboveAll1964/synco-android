@@ -14,7 +14,8 @@ import org.junit.Test
 class DataStoreSettingsStoreTest {
 
     private val preferences = InMemoryPreferences()
-    private val settings = DataStoreSettingsStore(preferences, fallbackDisplayName = "SM-S936B")
+    private val settings =
+        DataStoreSettingsStore(preferences, fallbackDisplayName = "SM-S936B", clock = { EDITED_AT })
     private val trustedPeers = DataStoreTrustedPeerStore(preferences)
 
     @Test
@@ -31,8 +32,8 @@ class DataStoreSettingsStoreTest {
 
         settings.setDirections(MAC, PeerDirections.NONE)
 
-        assertEquals(mapOf(MAC.value to PeerDirections.NONE), storedDirections())
-        assertEquals(PeerDirections.NONE, settings.policy(MAC).first().directions)
+        assertEquals(mapOf(MAC.value to edited(PeerDirections.NONE)), storedDirections())
+        assertEquals(edited(PeerDirections.NONE), settings.policy(MAC).first().directions)
     }
 
     @Test
@@ -68,7 +69,7 @@ class DataStoreSettingsStoreTest {
 
         settings.pruneUntrustedDirections()
 
-        assertEquals(mapOf(MAC.value to outboundOnly), storedDirections())
+        assertEquals(mapOf(MAC.value to edited(outboundOnly)), storedDirections())
     }
 
     @Test
@@ -144,4 +145,11 @@ class DataStoreSettingsStoreTest {
 
     private suspend fun storedDirections(): Map<String, PeerDirections> =
         StoredDirections.all(preferences.data.first())
+
+    private fun edited(directions: PeerDirections): PeerDirections =
+        directions.copy(revision = EDITED_AT)
+
+    private companion object {
+        const val EDITED_AT = 1_700_000_000_000L
+    }
 }

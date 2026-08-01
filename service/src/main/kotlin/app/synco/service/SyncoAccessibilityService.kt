@@ -29,9 +29,15 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        gate = FocusGate(this)
+        val tuning = syncoGraphOrNull()?.captureTuning
+        gate = FocusGate(this) { tuning?.focusTimeoutMillis() ?: DEFAULT_FOCUS_TIMEOUT }
         val keyboards = InputMethodPackages.of(this)
-        detector = CopyIntentDetector(ownPackageName = packageName, excludedPackages = { keyboards })
+        detector = CopyIntentDetector(
+            ownPackageName = packageName,
+            excludedPackages = { keyboards },
+            gestureWindowMillis = { tuning?.gestureWindowMillis() ?: DEFAULT_GESTURE_WINDOW },
+            attemptsPerGesture = { tuning?.attemptsPerGesture() ?: DEFAULT_ATTEMPTS },
+        )
         capture = syncoGraphOrNull()?.clipboard?.also { it.setAccessibilityConnected(true) }
         FocusGateHolder.install(this)
         SyncoLog.clipboard.info("focus gate is ready")
@@ -69,6 +75,12 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
         release()
         scope.cancel()
         super.onDestroy()
+    }
+
+    private companion object {
+        const val DEFAULT_FOCUS_TIMEOUT = 800L
+        const val DEFAULT_GESTURE_WINDOW = 8_000L
+        const val DEFAULT_ATTEMPTS = 2
     }
 
     private fun release() {

@@ -378,6 +378,38 @@ A `clip` whose blob representations have not all completed is **not** applied to
 clipboard. Either the whole event lands or none of it does — a half-written clipboard is
 worse than a missed sync.
 
+### 7.6 `policy`
+
+Direction and per-type choices are a property of the *pair*, not of one device, so a change
+made on either side is mirrored to the other.
+
+```json
+{ "t": "policy",
+  "rev": 1785450000000,
+  "send": { "text": true, "image": true, "file": true },
+  "recv": { "text": true, "image": true, "file": false },
+  "paused": false,
+  "maxBlob": 1073741824 }
+```
+
+`rev` is the Unix millisecond timestamp of the local edit that produced this policy. It is
+opaque and only ever compared, never interpreted.
+
+Each side sends `policy` once the session is established, and again whenever its user
+changes a toggle for that peer. On receiving one:
+
+- If `rev` is not greater than the revision already stored for that peer, ignore it. A
+  device that has been offline therefore cannot undo a newer change made elsewhere.
+- Otherwise adopt it **mirrored**: the sender's `send` becomes the receiver's `recv`, and
+  the sender's `recv` becomes the receiver's `send`. "Do not send me images" on one device
+  is the same fact as "do not send images to that device" on the other.
+- `paused` and `maxBlob` are adopted as-is; they are properties of the pair.
+- Store the received `rev` unchanged, so the two devices converge on one revision.
+
+If both devices are edited while disconnected, the later edit wins on reconnect. Equal
+revisions are resolved in favour of the lexicographically smaller `did`, so both sides pick
+the same winner without another round trip.
+
 ### 7.5 `ack`
 
 ```json

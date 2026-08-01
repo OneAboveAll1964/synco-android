@@ -47,6 +47,10 @@ interface SettingsStore {
 
     suspend fun setDirections(deviceId: DeviceId, directions: PeerDirections)
 
+    suspend fun adoptDirections(deviceId: DeviceId, directions: PeerDirections)
+
+    suspend fun directionsFor(deviceId: DeviceId): PeerDirections
+
     suspend fun clearDirections(deviceId: DeviceId)
 
     suspend fun pruneUntrustedDirections()

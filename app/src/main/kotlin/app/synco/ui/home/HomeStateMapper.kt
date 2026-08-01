@@ -1,6 +1,7 @@
 package app.synco.ui.home
 
 import app.synco.clipboard.ClipboardCaptureStatus
+import app.synco.shizuku.ShizukuState
 import app.synco.storage.TrustedPeer
 import app.synco.sync.SyncState
 
@@ -15,6 +16,7 @@ internal object HomeStateMapper {
         policies: PeerPolicies,
         trusted: List<TrustedPeer>,
         clipboardStatus: ClipboardCaptureStatus,
+        shizukuState: ShizukuState,
     ): HomeUiState = HomeUiState(
         running = state.running,
         paused = preferences.paused,
@@ -22,13 +24,16 @@ internal object HomeStateMapper {
         displayName = preferences.displayName,
         receivedFolder = preferences.receivedFolder,
         maxBlobBytes = preferences.maxBlobBytes,
-        captureWaitMillis = preferences.captureWaitMillis,
+        captureTuning = preferences.captureTuning,
+        captureMode = preferences.captureMode,
+        shizukuPollMillis = preferences.shizukuPollMillis,
         identity = state.identity,
         peers = peerRows(state, policies, trusted),
         transfers = state.transfers,
         pendingPairing = state.pendingPairings.firstOrNull(),
         problem = state.problem,
         clipboardStatus = clipboardStatus,
+        shizukuState = shizukuState,
     )
 
     private fun peerRows(

@@ -11,6 +11,8 @@ interface ClipboardCapture {
 
     suspend fun captureVia(route: CaptureRoute): Boolean
 
+    suspend fun captureClip(clip: android.content.ClipData, route: CaptureRoute): Boolean
+
     fun clipTimestamp(): Long?
 
     fun setAccessibilityConnected(connected: Boolean)

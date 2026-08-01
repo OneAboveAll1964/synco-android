@@ -56,10 +56,26 @@ class ClipboardCaptureHub(
             "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
                 "and ${snapshot.transfers.size} blob(s)",
         )
-        if (route == CaptureRoute.ACCESSIBILITY_FOCUS_GATE) {
-            observedAccessibilityCopy.value = true
-            recomputeStatus()
+        markObserved(route)
+        emissions.emit(CapturedClip(snapshot, route))
+        return true
+    }
+
+    override suspend fun captureClip(clip: android.content.ClipData, route: CaptureRoute): Boolean {
+        val snapshot = readLock.withLock {
+            val candidate = reader.readClip(clip, UUID.randomUUID().toString(), maxBlobBytes())
+                ?: return false
+            if (suppression.consume(candidate.hash)) {
+                SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
+                return false
+            }
+            candidate
         }
+        SyncoLog.clipboard.info(
+            "captured a clip via $route with ${snapshot.reps.size} representation(s) " +
+                "and ${snapshot.transfers.size} blob(s)",
+        )
+        markObserved(route)
         emissions.emit(CapturedClip(snapshot, route))
         return true
     }
@@ -69,6 +85,12 @@ class ClipboardCaptureHub(
     override fun setAccessibilityConnected(connected: Boolean) {
         SyncoLog.clipboard.info("accessibility capture route ${if (connected) "connected" else "disconnected"}")
         this.connected.value = connected
+        recomputeStatus()
+    }
+
+    private fun markObserved(route: CaptureRoute) {
+        if (route == CaptureRoute.FOREGROUND_LISTENER) return
+        observedAccessibilityCopy.value = true
         recomputeStatus()
     }
 

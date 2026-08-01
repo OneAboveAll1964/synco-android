@@ -6,6 +6,8 @@ import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import app.synco.logging.SyncoLog
+import app.synco.shizuku.ShizukuAvailability
+import app.synco.shizuku.ShizukuClipboard
 import app.synco.sync.SyncState
 import kotlinx.coroutines.launch
 
@@ -19,6 +21,15 @@ class SyncoForegroundService : LifecycleService() {
 
     private val watcher by lazy { ClipboardChangeWatcher(this, lifecycleScope) }
 
+    private val shizuku by lazy {
+        ShizukuCaptureLoop(
+            availability = ShizukuAvailability(this),
+            clipboard = ShizukuClipboard(),
+            capture = graph.clipboard,
+            tuning = graph.captureTuning,
+        )
+    }
+
     @Volatile
     private var syncing = false
 
@@ -27,6 +38,8 @@ class SyncoForegroundService : LifecycleService() {
         notifications.createChannel()
         lifecycleScope.launch { graph.state.collect(::publish) }
         watcher.start()
+        lifecycleScope.launch { shizuku.run() }
+        lifecycleScope.launch { ShizukuStatus.publish(shizuku.state) }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

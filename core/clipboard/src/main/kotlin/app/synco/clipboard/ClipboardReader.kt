@@ -1,5 +1,6 @@
 package app.synco.clipboard
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import app.synco.logging.SyncoLog
 import app.synco.protocol.ProtocolConstants
@@ -29,6 +30,14 @@ class ClipboardReader(
             SyncoLog.clipboard.warn("the primary clip was unavailable, the clipboard may not be readable yet")
             return null
         }
+        return readClip(clip, clipId, maxBlobBytes)
+    }
+
+    suspend fun readClip(
+        clip: ClipData,
+        clipId: String,
+        maxBlobBytes: Long = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
+    ): ClipboardSnapshot? {
         val prepared = mutableListOf<PreparedRep>()
         for (index in 0 until clip.itemCount) {
             prepared += items.reps(clipId, clip.getItemAt(index), maxBlobBytes)

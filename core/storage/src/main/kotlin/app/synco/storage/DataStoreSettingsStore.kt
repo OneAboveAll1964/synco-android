@@ -7,12 +7,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import app.synco.protocol.DeviceId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 class DataStoreSettingsStore internal constructor(
     private val dataStore: DataStore<Preferences>,
     private val fallbackDisplayName: String = Build.MODEL,
+    private val clock: () -> Long = System::currentTimeMillis,
 ) : SettingsStore {
 
     private val snapshots: Flow<SettingsSnapshot> =
@@ -96,6 +98,15 @@ class DataStoreSettingsStore internal constructor(
     }
 
     override suspend fun setDirections(deviceId: DeviceId, directions: PeerDirections) =
+        storeDirections(deviceId, directions.copy(revision = clock()))
+
+    override suspend fun adoptDirections(deviceId: DeviceId, directions: PeerDirections) =
+        storeDirections(deviceId, directions)
+
+    override suspend fun directionsFor(deviceId: DeviceId): PeerDirections =
+        policy(deviceId).first().directions
+
+    private suspend fun storeDirections(deviceId: DeviceId, directions: PeerDirections) =
         writeDirections { preferences, current ->
             when (deviceId.value) {
                 in StoredTrustedPeers.deviceIds(preferences).orEmpty() ->

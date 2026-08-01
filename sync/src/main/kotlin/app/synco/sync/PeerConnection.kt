@@ -5,6 +5,7 @@ import app.synco.discovery.DiscoveredPeer
 import app.synco.protocol.DeviceId
 import app.synco.protocol.message.Caps
 import app.synco.protocol.message.CloseReason
+import app.synco.protocol.message.PolicySync
 import app.synco.storage.SyncPolicy
 import app.synco.storage.TrustedPeer
 import app.synco.transport.Backoff
@@ -26,6 +27,7 @@ internal class PeerConnection(
     private val events: SyncEventSink,
     private val scope: CoroutineScope,
     private val backoff: Backoff = Backoff(),
+    private val policies: PolicyExchange? = null,
 ) {
     private val facts = PeerFacts(peerDeviceId, role, settings.policy)
 
@@ -56,6 +58,15 @@ internal class PeerConnection(
         refreshStatus()
     }
 
+    suspend fun onPeerPolicy(policy: PolicySync) {
+        policies?.adopt(peerDeviceId, policy)
+    }
+
+    suspend fun publishPolicy() {
+        val exchange = policies ?: return
+        slot.sendPolicy(exchange.localPolicy(peerDeviceId), settings.policy)
+    }
+
     fun onPeerCaps(caps: Caps) {
         settings.peerCaps = caps
         facts.setCaps(caps)
@@ -66,6 +77,7 @@ internal class PeerConnection(
         settings.policy = policy
         facts.setPolicy(policy)
         slot.sendCaps()
+        publishPolicy()
     }
 
     suspend fun claim(
@@ -77,6 +89,7 @@ internal class PeerConnection(
         backoff.reset()
         facts.connected(peer)
         slot.sendCaps()
+        publishPolicy()
         events.record(SyncEvent.of(SyncEvent.Kind.PEER_CONNECTED, peerDeviceId))
         return SessionBinding(this, session, claimed.router)
     }

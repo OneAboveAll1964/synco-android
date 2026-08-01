@@ -3,7 +3,10 @@ package app.synco.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.synco.SyncServiceGateway
+import app.synco.service.ShizukuStatus
 import app.synco.protocol.DeviceId
+import app.synco.storage.CaptureMode
+import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
 import app.synco.sync.SyncDirection
 import app.synco.sync.SyncoGraph
@@ -23,9 +26,9 @@ class HomeViewModel(
         HomePreferences.flowOf(graph.settings),
         PeerPolicies.flowOf(graph.settings),
         graph.trustedPeers.peers,
-        graph.clipboard.status,
-    ) { sync, preferences, policies, trusted, clipboardStatus ->
-        HomeStateMapper.map(sync, preferences, policies, trusted, clipboardStatus)
+        combine(graph.clipboard.status, ShizukuStatus.state, ::Pair),
+    ) { sync, preferences, policies, trusted, capture ->
+        HomeStateMapper.map(sync, preferences, policies, trusted, capture.first, capture.second)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIPTION_GRACE_MILLIS),
@@ -56,8 +59,16 @@ class HomeViewModel(
         graph.commands.setMaxBlobBytes(bytes)
     }
 
-    override fun setCaptureWaitMillis(millis: Long) {
-        graph.commands.setCaptureWaitMillis(millis)
+    override fun setCaptureTuning(tuning: CaptureTuning) {
+        graph.commands.setCaptureTuning(tuning)
+    }
+
+    override fun setCaptureMode(mode: CaptureMode) {
+        graph.commands.setCaptureMode(mode)
+    }
+
+    override fun setShizukuPollMillis(millis: Long) {
+        graph.commands.setShizukuPollMillis(millis)
     }
 
     override fun setDirection(deviceId: DeviceId, direction: SyncDirection) {

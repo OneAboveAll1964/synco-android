@@ -20,12 +20,13 @@ internal class PeerSessionRegistry(
     events: SyncEventSink,
     scope: CoroutineScope,
     private val pairings: PairingCoordinator,
+    private val exchange: PolicyExchange? = null,
 ) : SessionHosts {
 
     private val policies = PolicyBook()
     private val runner = PeerSessionRunner(this)
     private val directory = PeerDirectory(
-        PeerConnectionFactory(selfDeviceId, policies, routers, dialer, runner, events, scope),
+        PeerConnectionFactory(selfDeviceId, policies, routers, dialer, runner, events, scope, exchange),
     )
 
     val views: Flow<List<PeerView>> get() = directory.views

@@ -16,7 +16,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class FocusGate(
     private val service: AccessibilityService,
-    private val focusTimeoutMillis: Long = DEFAULT_FOCUS_TIMEOUT_MILLIS,
+    private val focusTimeoutMillis: () -> Long = { DEFAULT_FOCUS_TIMEOUT_MILLIS },
 ) {
     private val gate = Mutex()
 
@@ -35,10 +35,11 @@ class FocusGate(
             }
             if (!added) return null
             try {
-                val focused = withTimeoutOrNull(focusTimeoutMillis) { probe.awaitFocus() } != null
+                val budget = focusTimeoutMillis()
+                val focused = withTimeoutOrNull(budget) { probe.awaitFocus() } != null
                 if (!focused) {
                     SyncoLog.clipboard.warn(
-                        "the focus overlay never gained focus within ${focusTimeoutMillis}ms",
+                        "the focus overlay never gained focus within ${budget}ms",
                     )
                     return null
                 }

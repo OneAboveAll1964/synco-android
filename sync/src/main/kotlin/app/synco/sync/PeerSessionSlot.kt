@@ -1,5 +1,9 @@
 package app.synco.sync
 
+import app.synco.protocol.message.PolicySync
+import app.synco.storage.PeerDirections
+import app.synco.storage.SyncPolicy
+
 import app.synco.crypto.HandshakeRole
 import app.synco.protocol.DeviceId
 import app.synco.protocol.message.CloseReason
@@ -58,5 +62,20 @@ internal class PeerSessionSlot(
     suspend fun sendCaps() {
         val link = current?.link ?: return
         quietly { link.send(settings.policy.toCaps()) }
+    }
+
+    suspend fun sendPolicy(directions: PeerDirections, policy: SyncPolicy) {
+        val link = current?.link ?: return
+        quietly {
+            link.send(
+                PolicySync(
+                    revision = directions.revision,
+                    send = directions.send,
+                    receive = directions.receive,
+                    paused = policy.paused,
+                    maxBlobBytes = policy.maxBlobBytes,
+                ),
+            )
+        }
     }
 }

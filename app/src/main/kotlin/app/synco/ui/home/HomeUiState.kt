@@ -2,7 +2,10 @@ package app.synco.ui.home
 
 import app.synco.clipboard.ClipboardCaptureStatus
 import app.synco.protocol.ProtocolConstants
-import app.synco.storage.CaptureWaitChoice
+import app.synco.shizuku.ShizukuState
+import app.synco.storage.CaptureMode
+import app.synco.storage.CaptureTuning
+import app.synco.storage.ShizukuPollChoice
 import app.synco.sync.DeviceIdentity
 import app.synco.sync.PendingPairing
 import app.synco.sync.SyncProblem
@@ -15,7 +18,10 @@ data class HomeUiState(
     val displayName: String,
     val receivedFolder: String?,
     val maxBlobBytes: Long,
-    val captureWaitMillis: Long,
+    val captureTuning: CaptureTuning,
+    val captureMode: CaptureMode,
+    val shizukuPollMillis: Long,
+    val shizukuState: ShizukuState,
     val identity: DeviceIdentity?,
     val peers: List<PeerRow>,
     val transfers: List<TransferView>,
@@ -33,7 +39,10 @@ data class HomeUiState(
             displayName = "",
             receivedFolder = null,
             maxBlobBytes = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
-            captureWaitMillis = CaptureWaitChoice.DEFAULT.millis,
+            captureTuning = CaptureTuning.DEFAULT,
+            captureMode = CaptureMode.DEFAULT,
+            shizukuPollMillis = ShizukuPollChoice.DEFAULT.millis,
+            shizukuState = ShizukuState.NOT_INSTALLED,
             identity = null,
             peers = emptyList(),
             transfers = emptyList(),

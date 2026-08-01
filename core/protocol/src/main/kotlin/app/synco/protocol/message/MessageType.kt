@@ -8,6 +8,7 @@ object MessageType {
     const val PAIR_REQUEST = "pairRequest"
     const val PAIR_RESPONSE = "pairResponse"
     const val CAPS = "caps"
+    const val POLICY = "policy"
     const val PING = "ping"
     const val PONG = "pong"
     const val CLIP = "clip"
@@ -23,6 +24,7 @@ object MessageType {
         PAIR_REQUEST,
         PAIR_RESPONSE,
         CAPS,
+        POLICY,
         PING,
         PONG,
         CLIP,

@@ -20,6 +20,7 @@ class SyncoGraph private constructor(
     val settings: SettingsStore,
     val trustedPeers: TrustedPeerStore,
     val clipboard: ClipboardCapture,
+    val captureTuning: CaptureTuningHolder,
 ) {
     companion object {
         fun create(context: Context, scope: CoroutineScope): SyncoGraph {
@@ -27,8 +28,8 @@ class SyncoGraph private constructor(
             val storage = SyncoStorage.create(application)
             val transfers = TransferLayer(application)
             val blobLimit = BlobSizeLimit(storage.settings, scope)
-            val captureWait = CaptureWait(storage.settings, scope)
-            val clipboard = ClipboardLayer(application, transfers, blobLimit::bytes, captureWait::millis)
+            val captureTuning = CaptureTuningHolder(storage.settings, scope)
+            val clipboard = ClipboardLayer(application, transfers, blobLimit::bytes, captureTuning::waitMillis)
             val state = SyncStateHolder()
             val folder = ReceivedFolder(storage.settings, scope)
             val destination = DocumentTreeDestination(
@@ -92,6 +93,7 @@ class SyncoGraph private constructor(
                 settings = storage.settings,
                 trustedPeers = storage.trustedPeers,
                 clipboard = clipboard.capture,
+                captureTuning = captureTuning,
             )
         }
     }
