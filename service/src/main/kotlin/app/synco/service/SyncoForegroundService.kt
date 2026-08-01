@@ -10,7 +10,9 @@ import app.synco.shizuku.ShizukuAvailability
 import app.synco.shizuku.ShizukuClipboard
 import app.synco.shizuku.ShizukuBinderWatch
 import app.synco.shizuku.ShizukuPermission
+import app.synco.shizuku.ShizukuStream
 import app.synco.sync.SyncState
+import app.synco.transfer.UriFallback
 import kotlinx.coroutines.launch
 
 class SyncoForegroundService : LifecycleService() {
@@ -39,6 +41,7 @@ class SyncoForegroundService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        UriFallback.install { ShizukuStream.open(it) }
         notifications.createChannel()
         transferNotifications.createChannel()
         lifecycleScope.launch { graph.state.collect(::publish) }
@@ -64,6 +67,7 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        UriFallback.clear()
         ShizukuPermission.stop()
         ShizukuBinderWatch.stop()
         transferNotifications.dismissAll()

@@ -20,7 +20,9 @@ sealed interface TransferSource {
         override val declaredSize: Long,
     ) : TransferSource {
         override fun openStream(resolver: ContentResolver): InputStream =
-            resolver.openInputStream(uri) ?: throw FileNotFoundException("cannot open $uri")
+            runCatching { resolver.openInputStream(uri) }.getOrNull()
+                ?: UriFallback.open(uri)
+                ?: throw FileNotFoundException("cannot open $uri")
     }
 
     class Local(
