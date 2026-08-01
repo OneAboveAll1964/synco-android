@@ -1,5 +1,9 @@
-<div style="display: flex; justify-content: center; width: 100%;">
-  <img src="docs/icon.png" style="width: 100%; max-width: 200px;" alt="Synco">
+<div style="width: 100%; text-align: center;">
+  <img
+    src="docs/icon.png"
+    style="width: 100%; max-width: 200px; height: auto;"
+    alt="Synco"
+  >
 </div>
 
 # Synco for Android - Sync Clipboard Between your Mac and Android Phone
