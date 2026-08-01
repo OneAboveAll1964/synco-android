@@ -1,6 +1,6 @@
 <img src="docs/icon.png" width="120" alt="Synco">
 
-# Synco for Android
+# Synco for Android - Sync Clipboard Between your Mac and Android Phone
 
 One clipboard shared between your Android phone and your Mac, over your own
 network. Copy on one, paste on the other. Text, links, images and files.
@@ -20,7 +20,7 @@ device so nobody else can pair with you.
 Everything about how the two sides talk is written down in
 [PROTOCOL.md](PROTOCOL.md), which is identical in both repositories.
 
-## Reading the clipboard: the honest part
+## Reading the clipboard
 
 Since Android 10, an app can only read the clipboard while it owns the window you
 are looking at. That was done to stop apps snooping on what you copy, and it

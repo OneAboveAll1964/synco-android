@@ -5,6 +5,8 @@ enum class AttemptsChoice(val attempts: Int) {
     TWO(2),
     THREE(3),
     FOUR(4),
+    SIX(6),
+    EIGHT(8),
     ;
 
     companion object {

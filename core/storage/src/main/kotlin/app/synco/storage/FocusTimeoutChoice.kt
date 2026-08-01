@@ -1,9 +1,12 @@
 package app.synco.storage
 
 enum class FocusTimeoutChoice(val millis: Long) {
-    QUICK(400L),
+    QUICK(250L),
+    SWIFT(400L),
     STANDARD(800L),
-    GENEROUS(1_500L),
+    GENEROUS(1_200L),
+    PATIENT(1_500L),
+    VERY_PATIENT(2_500L),
     ;
 
     companion object {
