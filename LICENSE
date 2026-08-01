@@ -1,6 +1,6 @@
-MIT License
+MIT License with Attribution
 
-Copyright (c) 2026 Synco
+Copyright (c) 2026 Shko Maghdid (https://github.com/OneAboveAll1964)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -11,6 +11,14 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+Attribution is required. Any distribution of the Software, in original or in
+modified form, in source or in binary form, and any product or work derived
+from or built upon the Software, must give clear and visible credit to Shko
+Maghdid (https://github.com/OneAboveAll1964) as the original author. That
+credit must appear somewhere a user or a reader can reasonably find it, such
+as an about screen, a credits screen, the documentation, or the project's
+README, and must say that the work is based on Synco.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
