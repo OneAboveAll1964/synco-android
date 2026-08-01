@@ -19,11 +19,18 @@ class ContentUriMetadata(private val resolver: ContentResolver) {
                 }
             }
         }
-        val mime = mimeOf(uri)
+        val elsewhere = if (queriedName.isNullOrBlank()) UriFallback.describe(uri) else null
+        val name = queriedName?.takeIf { it.isNotBlank() } ?: elsewhere?.name
+        val mime = mimeOf(uri).takeIf { it != ContentMetadata.DEFAULT_MIME }
+            ?: elsewhere?.mime?.takeIf { it.isNotBlank() }
+            ?: mimeOf(uri)
+        val size = queriedSize?.takeIf { it >= 0 }
+            ?: elsewhere?.size?.takeIf { it >= 0 }
+            ?: measure(uri)
         return ContentMetadata(
-            name = queriedName?.takeIf { it.isNotBlank() }?.let { SafeFileName.of(it) } ?: fallbackName(uri, mime),
+            name = name?.takeIf { it.isNotBlank() }?.let { SafeFileName.of(it) } ?: fallbackName(uri, mime),
             mime = mime,
-            size = queriedSize?.takeIf { it >= 0 } ?: measure(uri),
+            size = size,
         )
     }
 

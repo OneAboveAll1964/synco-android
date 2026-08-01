@@ -8,6 +8,7 @@ android {
 
 dependencies {
     api(project(":core:logging"))
+    api(project(":core:transfer"))
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
     implementation(libs.hidden.api.bypass)

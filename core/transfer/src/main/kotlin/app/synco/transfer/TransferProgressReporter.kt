@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 internal class TransferProgressReporter {
 
+    private val throttle = ProgressThrottle()
+
     private val events = MutableSharedFlow<TransferProgress>(
         extraBufferCapacity = PROGRESS_BUFFER,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -15,6 +17,15 @@ internal class TransferProgressReporter {
     val progress: SharedFlow<TransferProgress> = events.asSharedFlow()
 
     fun incoming(transfer: IncomingTransfer, state: TransferProgress.State) {
+        if (!throttle.allows(
+                transfer.transferId,
+                state,
+                transfer.bytesWritten,
+                transfer.expectedSize,
+            )
+        ) {
+            return
+        }
         events.tryEmit(
             TransferProgress(
                 transferId = transfer.transferId,
@@ -28,6 +39,7 @@ internal class TransferProgressReporter {
     }
 
     fun outgoing(transfer: OutgoingTransfer, state: TransferProgress.State, bytesTransferred: Long) {
+        if (!throttle.allows(transfer.transferId, state, bytesTransferred, transfer.size)) return
         events.tryEmit(
             TransferProgress(
                 transferId = transfer.transferId,
@@ -41,6 +53,6 @@ internal class TransferProgressReporter {
     }
 
     private companion object {
-        const val PROGRESS_BUFFER = 64
+        const val PROGRESS_BUFFER = 256
     }
 }

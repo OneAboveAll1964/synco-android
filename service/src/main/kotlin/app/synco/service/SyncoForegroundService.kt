@@ -41,7 +41,7 @@ class SyncoForegroundService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
-        UriFallback.install { ShizukuStream.open(it) }
+        UriFallback.install(ShizukuStream)
         notifications.createChannel()
         transferNotifications.createChannel()
         lifecycleScope.launch { graph.state.collect(::publish) }
