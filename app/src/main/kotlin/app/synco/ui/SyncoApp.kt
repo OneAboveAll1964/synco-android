@@ -28,6 +28,7 @@ import app.synco.ui.home.HomeScreen
 import app.synco.ui.home.HomeViewModel
 import app.synco.ui.home.HomeViewModelFactory
 import app.synco.ui.home.SendSheet
+import app.synco.ui.home.ServiceScreen
 import app.synco.ui.home.SettingsScreen
 import app.synco.ui.home.homeStatusText
 import app.synco.ui.pairing.PairingDialog
@@ -76,6 +77,12 @@ fun SyncoApp(modifier: Modifier = Modifier) {
     ) { insets ->
         when (destination) {
             SyncoDestination.HOME -> HomeScreen(
+                state = state,
+                actions = model,
+                modifier = Modifier.padding(insets),
+            )
+
+            SyncoDestination.SERVICE -> ServiceScreen(
                 state = state,
                 statusText = homeStatusText(state),
                 permissions = permissions,

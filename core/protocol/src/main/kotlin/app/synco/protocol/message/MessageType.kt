@@ -16,6 +16,8 @@ object MessageType {
     const val TRANSFER_END = "transferEnd"
     const val TRANSFER_ABORT = "transferAbort"
     const val TRANSFER_PROGRESS = "transferProgress"
+    const val SHIZUKU_START = "shizukuStart"
+    const val SHIZUKU_START_RESULT = "shizukuStartResult"
     const val ACK = "ack"
     const val BYE = "bye"
 
@@ -33,6 +35,8 @@ object MessageType {
         TRANSFER_END,
         TRANSFER_ABORT,
         TRANSFER_PROGRESS,
+        SHIZUKU_START,
+        SHIZUKU_START_RESULT,
         ACK,
         BYE,
     )

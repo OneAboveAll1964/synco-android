@@ -44,7 +44,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
                 getByName("debug") {
                     applicationIdSuffix = ".debug"
-                    versionNameSuffix = "-debug"
                 }
             }
         }

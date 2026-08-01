@@ -64,6 +64,9 @@ class TransferNotifications(private val context: Context) {
             .setLocalOnly(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+        if (LiveUpdateSupport.isAvailable(manager)) {
+            TransferLiveUpdate.apply(context, builder, progress, percent)
+        }
         return builder.build()
     }
 

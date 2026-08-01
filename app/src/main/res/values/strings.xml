@@ -118,6 +118,8 @@
     <string name="shizuku_open">Open Shizuku</string>
     <string name="shizuku_get">Get Shizuku</string>
     <string name="history_title">Recent activity</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
     <string name="history_empty">Nothing has moved between your devices yet.</string>
     <string name="history_clip_sent">Sent a clip</string>
     <string name="history_clip_dropped">A clip was not sent</string>
@@ -133,6 +135,7 @@
     <string name="history_pairing_requested">Pairing requested</string>
     <string name="history_engine_failed">Sync could not start</string>
     <string name="tab_home">Home</string>
+    <string name="tab_service">Service</string>
     <string name="tab_settings">Settings</string>
     <string name="send_title">Send to your Mac</string>
     <string name="send_text">Send text</string>
