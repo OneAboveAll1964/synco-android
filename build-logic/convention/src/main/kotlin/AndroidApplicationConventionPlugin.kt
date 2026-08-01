@@ -20,8 +20,21 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 versionCode = BuildConstants.VERSION_CODE
                 versionName = BuildConstants.VERSION_NAME
             }
+            val keystoreProperties = java.util.Properties().apply {
+                val file = target.rootProject.file("keystore.properties")
+                if (file.exists()) file.inputStream().use { load(it) }
+            }
+            if (keystoreProperties.isNotEmpty()) {
+                signingConfigs.create("release") {
+                    storeFile = target.rootProject.file(keystoreProperties.getProperty("storeFile"))
+                    storePassword = keystoreProperties.getProperty("storePassword")
+                    keyAlias = keystoreProperties.getProperty("keyAlias")
+                    keyPassword = keystoreProperties.getProperty("keyPassword")
+                }
+            }
             buildTypes {
                 getByName("release") {
+                    signingConfig = signingConfigs.findByName("release")
                     isMinifyEnabled = true
                     isShrinkResources = true
                     proguardFiles(
