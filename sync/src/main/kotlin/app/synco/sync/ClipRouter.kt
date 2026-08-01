@@ -8,6 +8,8 @@ import app.synco.protocol.message.Clip
 import app.synco.protocol.message.Envelope
 import app.synco.protocol.message.TransferAbort
 import app.synco.protocol.message.TransferEnd
+import app.synco.protocol.message.ShizukuStartRequest
+import app.synco.protocol.message.ShizukuStartResult
 import app.synco.protocol.message.TransferProgressReport
 import app.synco.protocol.message.TransferStart
 import app.synco.transfer.ReceivedFileDestination
@@ -23,6 +25,7 @@ class ClipRouter(
     private val events: SyncEventSink,
     destination: ReceivedFileDestination,
     announcer: ReceivedFileAnnouncer,
+    private val shizuku: ShizukuStartSink = ShizukuStartSink.NONE,
 ) {
     private val aborts = OutboundAborts()
 
@@ -39,6 +42,10 @@ class ClipRouter(
 
     suspend fun send(snapshot: ClipboardSnapshot): Boolean = sender.send(snapshot)
 
+    suspend fun requestShizukuStart() {
+        link.send(ShizukuStartRequest)
+    }
+
     private fun onPeerProgress(report: TransferProgressReport) {
         val transferId = TransferIds.parseOrNull(report.transferId) ?: return
         transfers.reportPeerProgress(transferId, report.receivedBytes)
@@ -52,6 +59,9 @@ class ClipRouter(
             is TransferAbort -> onAbort(envelope)
             is Ack -> onAck(envelope)
             is TransferProgressReport -> onPeerProgress(envelope)
+            is ShizukuStartResult -> shizuku.report(
+                ShizukuStartReport(envelope.started, envelope.reason),
+            )
             else -> Unit
         }
     }

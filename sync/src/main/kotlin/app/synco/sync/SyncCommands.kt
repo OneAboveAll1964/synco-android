@@ -26,6 +26,7 @@ class SyncCommands internal constructor(
     private val scope: CoroutineScope,
     private val manual: app.synco.clipboard.ManualClips,
     private val events: SyncEventSink,
+    private val reports: ShizukuStartReports,
 ) {
     fun start() = fire { engine.start() }
 
@@ -78,6 +79,14 @@ class SyncCommands internal constructor(
 
     fun reconnectPeer(deviceId: DeviceId) {
         engine.reconnect(deviceId)
+    }
+
+    fun requestShizukuStart(deviceId: DeviceId) = fire {
+        engine.requestShizukuStart(deviceId)
+    }
+
+    fun clearShizukuStart() {
+        reports.clear()
     }
 
     fun cancelTransfer(transferId: UUID) {

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.synco.R
+import app.synco.protocol.DeviceId
 import app.synco.shizuku.ShizukuState
 import app.synco.storage.CaptureMode
 
@@ -21,7 +22,10 @@ import app.synco.storage.CaptureMode
 fun CaptureModeCard(
     mode: CaptureMode,
     shizukuState: ShizukuState,
+    adbHelper: PeerRow?,
+    startPending: Boolean,
     onModeChange: (CaptureMode) -> Unit,
+    onStartOverAdb: (DeviceId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
@@ -61,6 +65,12 @@ fun CaptureModeCard(
                     },
                 )
                 ShizukuAction(state = shizukuState)
+                ShizukuOverAdbAction(
+                    state = shizukuState,
+                    helper = adbHelper,
+                    pending = startPending,
+                    onRequest = onStartOverAdb,
+                )
             }
         }
     }

@@ -135,6 +135,15 @@
     <string name="history_pairing_requested">Pairing requested</string>
     <string name="history_engine_failed">Sync could not start</string>
     <string name="tab_home">Home</string>
+    <string name="blob_size_unlimited">No limit</string>
+    <string name="shizuku_start_over_adb">Start Shizuku using %1$s</string>
+    <string name="shizuku_start_over_adb_hint">Your phone has to be plugged into that computer with USB debugging on.</string>
+    <string name="shizuku_start_sent">Asking your computer to start Shizuku…</string>
+    <string name="shizuku_started">Shizuku is running. Synco switched to it.</string>
+    <string name="shizuku_start_failed">Could not start Shizuku from your computer.</string>
+    <string name="shizuku_start_not_allowed">Turn on the adb option in Synco’s settings on that computer first.</string>
+    <string name="shizuku_start_adb_missing">That computer does not have adb installed.</string>
+    <string name="shizuku_start_no_device">That computer cannot see your phone over adb.</string>
     <string name="tab_service">Service</string>
     <string name="tab_settings">Settings</string>
     <string name="send_title">Send to your Mac</string>

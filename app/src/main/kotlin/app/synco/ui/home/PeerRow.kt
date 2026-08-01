@@ -19,6 +19,7 @@ data class PeerRow(
     val send: CapsFlags,
     val receive: CapsFlags,
     val peerAccepts: CapsFlags?,
+    val startsShizukuOverAdb: Boolean = false,
 ) {
     val isConnected: Boolean get() = status.isLive
 
@@ -35,6 +36,7 @@ data class PeerRow(
             send = view.policy.directions.send,
             receive = view.policy.directions.receive,
             peerAccepts = view.peerCaps?.accepts,
+            startsShizukuOverAdb = view.peerCaps?.adbShizuku == true,
         )
 
         fun of(peer: TrustedPeer, policy: SyncPolicy): PeerRow = PeerRow(

@@ -12,6 +12,7 @@ data class SyncState(
     val lastEvent: SyncEvent? = null,
     val history: List<SyncEvent> = emptyList(),
     val problem: SyncProblem? = null,
+    val shizukuStart: ShizukuStartReport? = null,
 ) {
     val connectedPeers: List<PeerView> get() = peers.filter { it.isConnected }
 

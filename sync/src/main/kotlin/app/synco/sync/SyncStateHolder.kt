@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class SyncStateHolder : SyncEventSink {
+class SyncStateHolder : SyncEventSink, ShizukuStartSink, ShizukuStartReports {
 
     private val current = MutableStateFlow(SyncState.IDLE)
 
@@ -59,6 +59,14 @@ class SyncStateHolder : SyncEventSink {
                 history = (listOf(event) + state.history).take(HISTORY_LIMIT),
             )
         }
+    }
+
+    override fun report(report: ShizukuStartReport) {
+        current.update { it.copy(shizukuStart = report) }
+    }
+
+    override fun clear() {
+        current.update { it.copy(shizukuStart = null) }
     }
 
     fun clearPeers() {

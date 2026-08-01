@@ -35,7 +35,10 @@ fun SettingsScreen(
         CaptureModeCard(
             mode = state.captureMode,
             shizukuState = state.shizukuState,
+            adbHelper = state.adbShizukuHelper,
+            startPending = state.shizukuStartPending,
             onModeChange = actions::setCaptureMode,
+            onStartOverAdb = actions::requestShizukuStart,
         )
         CaptureTuningCard(
             tuning = state.captureTuning,

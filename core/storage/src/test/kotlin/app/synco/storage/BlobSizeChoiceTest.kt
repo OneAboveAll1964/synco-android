@@ -16,8 +16,21 @@ class BlobSizeChoiceTest {
     }
 
     @Test
-    fun anEnormousValueMapsToTheLargestChoice() {
-        assertEquals(BlobSizeChoice.ONE_GIGABYTE, BlobSizeChoice.nearest(Long.MAX_VALUE))
+    fun anEnormousValueMapsToNoLimit() {
+        assertEquals(BlobSizeChoice.UNLIMITED, BlobSizeChoice.nearest(Long.MAX_VALUE))
+    }
+
+    @Test
+    fun aValueJustOverAGigabyteStillMapsToAGigabyte() {
+        assertEquals(BlobSizeChoice.ONE_GIGABYTE, BlobSizeChoice.nearest(1_100_000_000L))
+    }
+
+    @Test
+    fun onlyNoLimitIsUnlimited() {
+        assertEquals(
+            listOf(BlobSizeChoice.UNLIMITED),
+            BlobSizeChoice.entries.filter { it.isUnlimited },
+        )
     }
 
     @Test

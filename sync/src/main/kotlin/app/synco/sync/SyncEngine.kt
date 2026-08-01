@@ -52,6 +52,10 @@ class SyncEngine internal constructor(
         runtime.dispatch(snapshot)
     }
 
+    suspend fun requestShizukuStart(deviceId: DeviceId) {
+        runtime?.registry?.routerOf(deviceId)?.requestShizukuStart()
+    }
+
     fun reconnect(deviceId: DeviceId) {
         runtime?.registry?.reconnect(deviceId)
     }

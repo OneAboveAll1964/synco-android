@@ -17,6 +17,7 @@ internal object HomeStateMapper {
         trusted: List<TrustedPeer>,
         clipboardStatus: ClipboardCaptureStatus,
         shizukuState: ShizukuState,
+        pending: Boolean,
     ): HomeUiState = HomeUiState(
         running = state.running,
         paused = preferences.paused,
@@ -35,6 +36,8 @@ internal object HomeStateMapper {
         history = state.history,
         clipboardStatus = clipboardStatus,
         shizukuState = shizukuState,
+        shizukuStart = state.shizukuStart,
+        shizukuStartPending = pending,
     )
 
     private fun peerRows(

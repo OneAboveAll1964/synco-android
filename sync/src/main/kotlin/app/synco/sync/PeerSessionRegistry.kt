@@ -33,6 +33,9 @@ internal class PeerSessionRegistry(
 
     fun routers(): List<ClipRouter> = directory.all.mapNotNull { it.router }
 
+    fun routerOf(deviceId: DeviceId): ClipRouter? =
+        directory.all.firstOrNull { it.peerDeviceId == deviceId }?.router
+
     fun applyDiscovered(peers: List<DiscoveredPeer>) {
         val byDeviceId = peers.filterNot { it.deviceId == selfDeviceId }.associateBy { it.deviceId }
         byDeviceId.forEach { (deviceId, peer) -> directory.of(deviceId).onDiscovered(peer) }

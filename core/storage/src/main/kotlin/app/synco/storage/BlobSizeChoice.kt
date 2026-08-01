@@ -7,7 +7,10 @@ enum class BlobSizeChoice(val bytes: Long) {
     TWO_FIFTY_MEGABYTES(262_144_000L),
     FIVE_HUNDRED_MEGABYTES(524_288_000L),
     ONE_GIGABYTE(1_073_741_824L),
+    UNLIMITED(Long.MAX_VALUE),
     ;
+
+    val isUnlimited: Boolean get() = this == UNLIMITED
 
     companion object {
         fun nearest(bytes: Long): BlobSizeChoice = entries.minBy { distance(it.bytes, bytes) }

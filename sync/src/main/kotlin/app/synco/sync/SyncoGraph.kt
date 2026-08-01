@@ -62,6 +62,7 @@ class SyncoGraph private constructor(
                     events = state,
                     destination = destination,
                     announcer = ToastAnnouncer(application),
+                    shizuku = state,
                 ),
                 pairings = pairings,
                 pipelines = EnginePipelines(
@@ -95,6 +96,7 @@ class SyncoGraph private constructor(
                     scope = scope,
                     manual = clipboard.manual,
                     events = state,
+                    reports = state,
                 ),
                 state = state.state,
                 settings = storage.settings,

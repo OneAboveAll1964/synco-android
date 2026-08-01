@@ -8,6 +8,7 @@ import app.synco.storage.CaptureTuning
 import app.synco.storage.ShizukuPollChoice
 import app.synco.sync.DeviceIdentity
 import app.synco.sync.PendingPairing
+import app.synco.sync.ShizukuStartReport
 import app.synco.sync.SyncEvent
 import app.synco.sync.SyncProblem
 import app.synco.sync.TransferView
@@ -30,8 +31,13 @@ data class HomeUiState(
     val problem: SyncProblem?,
     val history: List<SyncEvent>,
     val clipboardStatus: ClipboardCaptureStatus,
+    val shizukuStart: ShizukuStartReport? = null,
+    val shizukuStartPending: Boolean = false,
 ) {
     val connectedPeers: List<PeerRow> get() = peers.filter { it.isConnected }
+
+    val adbShizukuHelper: PeerRow?
+        get() = connectedPeers.firstOrNull { it.startsShizukuOverAdb }
 
     companion object {
         val EMPTY = HomeUiState(

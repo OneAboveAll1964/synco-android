@@ -8,12 +8,18 @@ import app.synco.protocol.DeviceId
 import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
+import app.synco.sync.ShizukuStartReport
 import app.synco.sync.SyncDirection
 import app.synco.sync.SyncoGraph
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class HomeViewModel(
@@ -21,19 +27,44 @@ class HomeViewModel(
     private val service: SyncServiceGateway,
 ) : ViewModel(), HomeActions {
 
+    private val pending = MutableStateFlow(false)
+
     val state: StateFlow<HomeUiState> = combine(
         graph.state,
         HomePreferences.flowOf(graph.settings),
         PeerPolicies.flowOf(graph.settings),
         graph.trustedPeers.peers,
-        combine(graph.clipboard.status, ShizukuStatus.state, ::Pair),
+        combine(graph.clipboard.status, ShizukuStatus.state, pending, ::Triple),
     ) { sync, preferences, policies, trusted, capture ->
-        HomeStateMapper.map(sync, preferences, policies, trusted, capture.first, capture.second)
+        HomeStateMapper.map(
+            sync,
+            preferences,
+            policies,
+            trusted,
+            capture.first,
+            capture.second,
+            capture.third,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIPTION_GRACE_MILLIS),
         initialValue = HomeUiState.EMPTY,
     )
+
+    init {
+        viewModelScope.launch {
+            graph.state
+                .map { it.shizukuStart }
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collect(::onShizukuStart)
+        }
+    }
+
+    private fun onShizukuStart(report: ShizukuStartReport) {
+        pending.value = false
+        if (report.started) graph.commands.setCaptureMode(CaptureMode.SHIZUKU)
+    }
 
     override fun setRunning(running: Boolean) {
         if (running) service.start() else service.stop()
@@ -67,6 +98,15 @@ class HomeViewModel(
         graph.commands.setCaptureMode(mode)
     }
 
+
+    override fun requestShizukuStart(deviceId: DeviceId) {
+        pending.value = true
+        graph.commands.requestShizukuStart(deviceId)
+    }
+
+    override fun clearShizukuStart() {
+        graph.commands.clearShizukuStart()
+    }
 
     override fun setShizukuPollMillis(millis: Long) {
         graph.commands.setShizukuPollMillis(millis)

@@ -47,7 +47,15 @@ fun BlobSizeCard(
                     FilterChip(
                         selected = choice == selected,
                         onClick = { onMaxBlobBytesChange(choice.bytes) },
-                        label = { Text(text = ByteSizeText.of(choice.bytes)) },
+                        label = {
+                            Text(
+                                text = if (choice.isUnlimited) {
+                                    stringResource(R.string.blob_size_unlimited)
+                                } else {
+                                    ByteSizeText.of(choice.bytes)
+                                },
+                            )
+                        },
                     )
                 }
             }

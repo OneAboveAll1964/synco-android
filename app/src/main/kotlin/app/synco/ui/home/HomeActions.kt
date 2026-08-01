@@ -47,5 +47,9 @@ interface HomeActions {
 
     fun sendFile(uri: android.net.Uri)
 
+    fun requestShizukuStart(deviceId: DeviceId)
+
+    fun clearShizukuStart()
+
     fun resetIdentity()
 }

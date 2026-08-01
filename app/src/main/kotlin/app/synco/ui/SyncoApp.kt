@@ -11,9 +11,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +33,7 @@ import app.synco.ui.home.HomeViewModelFactory
 import app.synco.ui.home.SendSheet
 import app.synco.ui.home.ServiceScreen
 import app.synco.ui.home.SettingsScreen
+import app.synco.ui.home.shizukuStartMessageRes
 import app.synco.ui.home.homeStatusText
 import app.synco.ui.pairing.PairingDialog
 import app.synco.ui.permissions.rememberPermissionsController
@@ -47,8 +51,17 @@ fun SyncoApp(modifier: Modifier = Modifier) {
     var destination by remember { mutableStateOf(SyncoDestination.HOME) }
     var sending by remember { mutableStateOf(false) }
 
+    val snackbars = remember { SnackbarHostState() }
+    val resources = LocalContext.current.resources
+    LaunchedEffect(state.shizukuStart) {
+        val report = state.shizukuStart ?: return@LaunchedEffect
+        snackbars.showSnackbar(resources.getString(shizukuStartMessageRes(report)))
+        model.clearShizukuStart()
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbars) },
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
         },
