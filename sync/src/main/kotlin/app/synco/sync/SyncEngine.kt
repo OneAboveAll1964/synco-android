@@ -1,5 +1,6 @@
 package app.synco.sync
 
+import app.synco.clipboard.ClipboardSnapshot
 import app.synco.protocol.DeviceId
 import app.synco.storage.IdentityUnavailable
 import kotlinx.coroutines.CancellationException
@@ -44,6 +45,11 @@ class SyncEngine internal constructor(
 
     suspend fun restartDiscovery() {
         runtime?.restartDiscovery()
+    }
+
+    suspend fun broadcast(snapshot: ClipboardSnapshot) {
+        val runtime = runtime ?: return
+        runtime.dispatch(snapshot)
     }
 
     fun reconnect(deviceId: DeviceId) {

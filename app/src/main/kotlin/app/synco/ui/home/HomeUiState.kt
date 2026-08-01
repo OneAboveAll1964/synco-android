@@ -8,6 +8,7 @@ import app.synco.storage.CaptureTuning
 import app.synco.storage.ShizukuPollChoice
 import app.synco.sync.DeviceIdentity
 import app.synco.sync.PendingPairing
+import app.synco.sync.SyncEvent
 import app.synco.sync.SyncProblem
 import app.synco.sync.TransferView
 
@@ -27,6 +28,7 @@ data class HomeUiState(
     val transfers: List<TransferView>,
     val pendingPairing: PendingPairing?,
     val problem: SyncProblem?,
+    val history: List<SyncEvent>,
     val clipboardStatus: ClipboardCaptureStatus,
 ) {
     val connectedPeers: List<PeerRow> get() = peers.filter { it.isConnected }
@@ -48,6 +50,7 @@ data class HomeUiState(
             transfers = emptyList(),
             pendingPairing = null,
             problem = null,
+            history = emptyList(),
             clipboardStatus = ClipboardCaptureStatus.SERVICE_DISABLED,
         )
     }

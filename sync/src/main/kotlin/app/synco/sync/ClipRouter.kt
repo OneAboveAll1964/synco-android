@@ -8,6 +8,7 @@ import app.synco.protocol.message.Clip
 import app.synco.protocol.message.Envelope
 import app.synco.protocol.message.TransferAbort
 import app.synco.protocol.message.TransferEnd
+import app.synco.protocol.message.TransferProgressReport
 import app.synco.protocol.message.TransferStart
 import app.synco.transfer.ReceivedFileDestination
 import app.synco.transfer.TransferIds
@@ -17,7 +18,7 @@ class ClipRouter(
     private val link: PeerLink,
     settings: PeerPolicySource,
     clipboard: ClipboardSink,
-    transfers: TransferGateway,
+    private val transfers: TransferGateway,
     blobs: BlobSender,
     private val events: SyncEventSink,
     destination: ReceivedFileDestination,
@@ -38,6 +39,11 @@ class ClipRouter(
 
     suspend fun send(snapshot: ClipboardSnapshot): Boolean = sender.send(snapshot)
 
+    private fun onPeerProgress(report: TransferProgressReport) {
+        val transferId = TransferIds.parseOrNull(report.transferId) ?: return
+        transfers.reportPeerProgress(transferId, report.receivedBytes)
+    }
+
     suspend fun receive(envelope: Envelope) {
         when (envelope) {
             is Clip -> receiver.onClip(envelope)
@@ -45,6 +51,7 @@ class ClipRouter(
             is TransferEnd -> receiver.onTransferEnd(envelope)
             is TransferAbort -> onAbort(envelope)
             is Ack -> onAck(envelope)
+            is TransferProgressReport -> onPeerProgress(envelope)
             else -> Unit
         }
     }

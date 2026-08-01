@@ -28,8 +28,6 @@ fun SyncoTheme(
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
         motionScheme = MotionScheme.expressive(),
-        shapes = SyncoShapes.value,
-        typography = SyncoTypography.value,
         content = content,
     )
 }

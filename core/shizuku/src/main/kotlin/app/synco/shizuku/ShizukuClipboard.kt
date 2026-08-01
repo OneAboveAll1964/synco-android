@@ -5,13 +5,32 @@ import android.os.IBinder
 import app.synco.logging.SyncoLog
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
 class ShizukuClipboard {
 
-    fun primaryClip(): ClipData? = runCatching { readThroughShell() }
-        .onFailure { SyncoLog.clipboard.warn("Shizuku could not read the clipboard", it) }
-        .getOrNull()
+    fun read(): ShizukuRead = try {
+        ShizukuRead.Clip(readThroughShell())
+    } catch (denied: SecurityException) {
+        SyncoLog.clipboard.warn("Shizuku refused the clipboard call", denied)
+        ShizukuRead.Denied
+    } catch (invocation: InvocationTargetException) {
+        classify(invocation.targetException ?: invocation)
+    } catch (failure: Throwable) {
+        classify(failure)
+    }
+
+    fun primaryClip(): ClipData? = (read() as? ShizukuRead.Clip)?.data
+
+    private fun classify(failure: Throwable): ShizukuRead {
+        if (failure is SecurityException) {
+            SyncoLog.clipboard.warn("Shizuku refused the clipboard call", failure)
+            return ShizukuRead.Denied
+        }
+        SyncoLog.clipboard.warn("Shizuku could not read the clipboard", failure)
+        return ShizukuRead.Unavailable
+    }
 
     private fun readThroughShell(): ClipData? {
         val service = clipboardService() ?: return null

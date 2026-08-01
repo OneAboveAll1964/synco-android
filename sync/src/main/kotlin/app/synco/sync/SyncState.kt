@@ -10,6 +10,7 @@ data class SyncState(
     val pendingPairings: List<PendingPairing> = emptyList(),
     val transfers: List<TransferView> = emptyList(),
     val lastEvent: SyncEvent? = null,
+    val history: List<SyncEvent> = emptyList(),
     val problem: SyncProblem? = null,
 ) {
     val connectedPeers: List<PeerView> get() = peers.filter { it.isConnected }

@@ -43,5 +43,9 @@ interface HomeActions {
 
     fun cancelTransfer(transferId: UUID)
 
+    fun sendText(value: String)
+
+    fun sendFile(uri: android.net.Uri)
+
     fun resetIdentity()
 }

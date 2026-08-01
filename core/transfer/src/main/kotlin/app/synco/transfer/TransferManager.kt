@@ -103,6 +103,11 @@ class TransferManager(
         return prepared
     }
 
+    fun reportPeerProgress(transferId: UUID, receivedBytes: Long) {
+        val transfer = outgoing[transferId] ?: return
+        reporter.outgoing(transfer, TransferProgress.State.RUNNING, receivedBytes)
+    }
+
     fun stream(transfer: OutgoingTransfer): Flow<BlobChunk> = transfer.chunks()
         .onStart { reporter.outgoing(transfer, TransferProgress.State.STARTED, 0L) }
         .transformWhile { chunk ->

@@ -24,6 +24,8 @@ class SyncCommands internal constructor(
     private val transfers: TransferGateway,
     private val clipboard: ClipboardCapture,
     private val scope: CoroutineScope,
+    private val manual: app.synco.clipboard.ManualClips,
+    private val events: SyncEventSink,
 ) {
     fun start() = fire { engine.start() }
 
@@ -82,6 +84,18 @@ class SyncCommands internal constructor(
         transfers.cancel(transferId)
     }
 
+    fun sendText(value: String) = fire {
+        val snapshot = manual.text(value) ?: return@fire
+        engine.broadcast(snapshot)
+        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_SENT, detail = MANUAL_TEXT))
+    }
+
+    fun sendFile(uri: android.net.Uri) = fire {
+        val snapshot = manual.file(uri, settings.maxBlobBytes.first()) ?: return@fire
+        engine.broadcast(snapshot)
+        events.record(SyncEvent.of(SyncEvent.Kind.CLIP_SENT, detail = MANUAL_FILE))
+    }
+
     fun refreshClipboard() = fire {
         clipboard.captureVia(CaptureRoute.FOREGROUND_LISTENER)
     }
@@ -101,5 +115,10 @@ class SyncCommands internal constructor(
         } else {
             settings.setDirections(deviceId, change(settings.policy(deviceId).first().directions))
         }
+    }
+
+    private companion object {
+        const val MANUAL_TEXT = "manual text"
+        const val MANUAL_FILE = "manual file"
     }
 }

@@ -422,6 +422,22 @@ lets the sending UI show "not synced — Mac isn't accepting files" rather than 
 
 ---
 
+### 7.7 `transferProgress`
+
+A sender knows how many bytes it has written, but not how many the other device has
+actually taken. For a large blob the two diverge, so the receiver reports its own count and
+both devices can show the same progress.
+
+```json
+{ "t": "transferProgress", "transferId": "...", "received": 8388608 }
+```
+
+Sent by the receiver while a blob is arriving, at most once every 500 ms per transfer, and
+never after `transferEnd`. `received` is the number of contiguous bytes written so far.
+
+This message is advisory. A device that never sends it is not at fault, and a sender that
+ignores it behaves exactly as before, so an implementation may skip it entirely.
+
 ## 8. Canonical hash and loop suppression
 
 Two devices writing to each other's clipboards is a feedback loop unless suppression is

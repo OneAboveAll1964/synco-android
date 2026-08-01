@@ -64,6 +64,12 @@ running, Synco falls back to accessibility and tells you why.
 
 ## Installing
 
+Grab the APK from [Releases](https://github.com/OneAboveAll1964/synco-android/releases)
+and install it. Android will warn about installing outside the Play Store, which
+is expected: Synco cannot be on Play, for the reason above.
+
+To build it yourself:
+
 ```bash
 export JAVA_HOME=/path/to/jdk-21
 ./gradlew assembleDebug

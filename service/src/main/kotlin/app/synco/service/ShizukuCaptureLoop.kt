@@ -5,6 +5,8 @@ import app.synco.clipboard.ClipboardCapture
 import app.synco.logging.SyncoLog
 import app.synco.shizuku.ShizukuAvailability
 import app.synco.shizuku.ShizukuClipboard
+import app.synco.shizuku.ShizukuBinderWatch
+import app.synco.shizuku.ShizukuPermission
 import app.synco.shizuku.ShizukuState
 import app.synco.storage.CaptureMode
 import app.synco.sync.CaptureTuningHolder
@@ -26,18 +28,23 @@ class ShizukuCaptureLoop(
     private var lastFingerprint: String? = null
 
     suspend fun run() {
+        ShizukuPermission.observe { refresh() }
+        ShizukuBinderWatch.observe(::refresh)
         while (true) {
+            val current = availability.state(clipboard::read)
+            stateFlow.value = current
             val chosen = tuning.mode() == CaptureMode.SHIZUKU
             if (!chosen) {
-                stateFlow.value = ShizukuState.NOT_INSTALLED
                 delay(IDLE_MILLIS)
                 continue
             }
-            val current = availability.state()
-            stateFlow.value = current
             if (current.isUsable) pollOnce()
             delay(if (current.isUsable) tuning.shizukuPollMillis() else UNAVAILABLE_MILLIS)
         }
+    }
+
+    private fun refresh() {
+        stateFlow.value = availability.state(clipboard::read)
     }
 
     private suspend fun pollOnce() {

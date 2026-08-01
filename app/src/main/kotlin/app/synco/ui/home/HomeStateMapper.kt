@@ -32,6 +32,7 @@ internal object HomeStateMapper {
         transfers = state.transfers,
         pendingPairing = state.pendingPairings.firstOrNull(),
         problem = state.problem,
+        history = state.history,
         clipboardStatus = clipboardStatus,
         shizukuState = shizukuState,
     )

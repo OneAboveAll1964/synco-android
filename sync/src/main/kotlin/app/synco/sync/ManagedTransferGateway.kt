@@ -27,6 +27,10 @@ class ManagedTransferGateway(private val transfers: TransferManager) : TransferG
 
     override fun chunksOf(transfer: OutgoingTransfer): Flow<BlobChunk> = transfers.stream(transfer)
 
+    override fun reportPeerProgress(transferId: UUID, receivedBytes: Long) {
+        transfers.reportPeerProgress(transferId, receivedBytes)
+    }
+
     override fun releaseOutgoing(transferId: UUID) {
         transfers.finishOutgoing(transferId)
     }

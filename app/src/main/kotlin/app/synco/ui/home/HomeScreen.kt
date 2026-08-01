@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.synco.ui.history.HistoryCard
 import app.synco.ui.permissions.PermissionsCard
 import app.synco.ui.permissions.PermissionsController
 
@@ -51,35 +52,10 @@ fun HomeScreen(
                 onResetIdentity = actions::resetIdentity,
             )
         }
-        DeviceIdentityCard(
-            identity = state.identity,
-            displayName = state.displayName,
-            onDisplayNameChange = actions::setDisplayName,
-        )
-        ReceivedFolderCard(
-            receivedFolder = state.receivedFolder,
-            onFolderChosen = actions::setReceivedFolder,
-        )
-        CaptureModeCard(
-            mode = state.captureMode,
-            shizukuState = state.shizukuState,
-            onModeChange = actions::setCaptureMode,
-        )
-        CaptureTuningCard(
-            tuning = state.captureTuning,
-            mode = state.captureMode,
-            shizukuPollMillis = state.shizukuPollMillis,
-            onTuningChange = actions::setCaptureTuning,
-            onShizukuPollChange = actions::setShizukuPollMillis,
-        )
-        BlobSizeCard(
-            maxBlobBytes = state.maxBlobBytes,
-            onMaxBlobBytesChange = actions::setMaxBlobBytes,
-        )
         if (state.transfers.isNotEmpty()) {
             TransferList(transfers = state.transfers, onCancel = actions::cancelTransfer)
         }
         PeerList(peers = state.peers, actions = actions)
-        AboutCard()
+        HistoryCard(history = state.history)
     }
 }

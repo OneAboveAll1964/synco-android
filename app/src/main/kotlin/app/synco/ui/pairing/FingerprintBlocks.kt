@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.synco.protocol.Fingerprint
 import app.synco.protocol.ProtocolConstants
-import app.synco.ui.theme.SyncoTypography
+import app.synco.ui.theme.IdentifierStyle
 
 @Composable
 fun FingerprintBlocks(fingerprint: Fingerprint, modifier: Modifier = Modifier) {
@@ -29,7 +29,7 @@ fun FingerprintBlocks(fingerprint: Fingerprint, modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = block,
-                    style = SyncoTypography.fingerprintBlock,
+                    style = IdentifierStyle.fingerprintBlock,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 )

@@ -9,10 +9,16 @@ class ShizukuAvailability(context: Context) {
 
     private val packages = context.applicationContext.packageManager
 
-    fun state(): ShizukuState {
-        if (!isInstalled()) return ShizukuState.NOT_INSTALLED
-        if (!isRunning()) return ShizukuState.NOT_RUNNING
-        return if (isGranted()) ShizukuState.READY else ShizukuState.PERMISSION_DENIED
+    fun state(probe: () -> ShizukuRead): ShizukuState {
+        if (!isRunning()) {
+            return if (isInstalled()) ShizukuState.NOT_RUNNING else ShizukuState.NOT_INSTALLED
+        }
+        if (!isGranted()) return ShizukuState.PERMISSION_DENIED
+        return when (probe()) {
+            is ShizukuRead.Clip -> ShizukuState.READY
+            ShizukuRead.Denied -> ShizukuState.PERMISSION_DENIED
+            ShizukuRead.Unavailable -> ShizukuState.NOT_RUNNING
+        }
     }
 
     fun requestPermission(requestCode: Int) {
@@ -20,10 +26,15 @@ class ShizukuAvailability(context: Context) {
             .onFailure { SyncoLog.clipboard.warn("could not ask Shizuku for permission", it) }
     }
 
-    private fun isInstalled(): Boolean = runCatching {
-        packages.getPackageInfo(SHIZUKU_PACKAGE, 0)
-        true
-    }.getOrDefault(false)
+    fun shouldExplain(): Boolean =
+        runCatching { Shizuku.shouldShowRequestPermissionRationale() }.getOrDefault(false)
+
+    private fun isInstalled(): Boolean = PACKAGES.any { candidate ->
+        runCatching {
+            packages.getPackageInfo(candidate, 0)
+            true
+        }.getOrDefault(false)
+    }
 
     private fun isRunning(): Boolean = runCatching { Shizuku.pingBinder() }.getOrDefault(false)
 
@@ -32,6 +43,6 @@ class ShizukuAvailability(context: Context) {
     }.getOrDefault(false)
 
     private companion object {
-        const val SHIZUKU_PACKAGE = "moe.shizuku.privileged.api"
+        val PACKAGES = listOf("moe.shizuku.privileged.api", "moe.shizuku.manager")
     }
 }

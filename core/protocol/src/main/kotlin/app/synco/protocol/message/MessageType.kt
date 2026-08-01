@@ -15,6 +15,7 @@ object MessageType {
     const val TRANSFER_START = "transferStart"
     const val TRANSFER_END = "transferEnd"
     const val TRANSFER_ABORT = "transferAbort"
+    const val TRANSFER_PROGRESS = "transferProgress"
     const val ACK = "ack"
     const val BYE = "bye"
 
@@ -31,6 +32,7 @@ object MessageType {
         TRANSFER_START,
         TRANSFER_END,
         TRANSFER_ABORT,
+        TRANSFER_PROGRESS,
         ACK,
         BYE,
     )

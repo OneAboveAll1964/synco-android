@@ -8,6 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import app.synco.logging.SyncoLog
 import app.synco.shizuku.ShizukuAvailability
 import app.synco.shizuku.ShizukuClipboard
+import app.synco.shizuku.ShizukuBinderWatch
+import app.synco.shizuku.ShizukuPermission
 import app.synco.sync.SyncState
 import kotlinx.coroutines.launch
 
@@ -62,6 +64,8 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        ShizukuPermission.stop()
+        ShizukuBinderWatch.stop()
         transferNotifications.dismissAll()
         watcher.stop()
         syncing = false

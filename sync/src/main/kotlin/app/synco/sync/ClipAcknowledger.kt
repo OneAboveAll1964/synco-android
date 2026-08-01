@@ -2,6 +2,7 @@ package app.synco.sync
 
 import app.synco.protocol.message.Ack
 import app.synco.protocol.message.AckReason
+import app.synco.protocol.message.TransferProgressReport
 import app.synco.transfer.TransferFailure
 import java.util.UUID
 
@@ -32,6 +33,10 @@ internal class ClipAcknowledger(
     suspend fun decline(clipId: String, reason: AckReason) {
         link.send(Ack.rejected(clipId, reason))
         events.record(SyncEvent.of(SyncEvent.Kind.CLIP_DECLINED, link.peerDeviceId, reason.wireValue))
+    }
+
+    suspend fun reportProgress(transferId: UUID, receivedBytes: Long) {
+        quietly { link.send(TransferProgressReport(transferId.toString(), receivedBytes)) }
     }
 
     suspend fun abort(transferId: UUID, failure: TransferFailure) {

@@ -1,5 +1,7 @@
 package app.synco.sync
 
+import app.synco.clipboard.ClipboardSnapshot
+
 import app.synco.discovery.DiscoveryService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -11,6 +13,10 @@ internal class EngineRuntime(
     private val discovery: DiscoveryService,
     private val transfers: TransferGateway,
 ) {
+    suspend fun dispatch(snapshot: ClipboardSnapshot) {
+        OutboundClipDispatcher(transfers).dispatch(snapshot, registry.routers())
+    }
+
     suspend fun restartDiscovery() {
         quietly { discovery.restart() }
     }

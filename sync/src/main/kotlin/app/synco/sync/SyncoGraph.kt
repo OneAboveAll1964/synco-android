@@ -4,6 +4,7 @@ import android.content.Context
 import app.synco.clipboard.ClipboardCapture
 import app.synco.discovery.NetworkChangeMonitor
 import app.synco.discovery.NsdDiscoveryService
+import app.synco.storage.CaptureMode
 import app.synco.storage.SettingsStore
 import app.synco.storage.SyncoStorage
 import app.synco.storage.TrustedPeerStore
@@ -65,6 +66,7 @@ class SyncoGraph private constructor(
                 pairings = pairings,
                 pipelines = EnginePipelines(
                     clipboard = ClipboardPipeline(
+                        readsElsewhere = { captureTuning.mode() == CaptureMode.SHIZUKU },
                         capture = clipboard.capture,
                         dispatcher = OutboundClipDispatcher(transfers.gateway),
                         state = state,
@@ -91,6 +93,8 @@ class SyncoGraph private constructor(
                     transfers = transfers.gateway,
                     clipboard = clipboard.capture,
                     scope = scope,
+                    manual = clipboard.manual,
+                    events = state,
                 ),
                 state = state.state,
                 settings = storage.settings,

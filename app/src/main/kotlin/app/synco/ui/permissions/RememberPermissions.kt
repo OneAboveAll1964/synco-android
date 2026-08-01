@@ -17,7 +17,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import app.synco.service.ClipboardAccessBridge
 
 @Composable
-fun rememberPermissionsController(): PermissionsController {
+fun rememberPermissionsController(clipboardReadElsewhere: Boolean = false): PermissionsController {
     val context = LocalContext.current
     val clipboard = remember(context) { ClipboardAccessBridge(context) }
     val notifications = rememberLauncherForActivityResult(
@@ -35,7 +35,9 @@ fun rememberPermissionsController(): PermissionsController {
         onDispose { lifecycle?.removeObserver(observer) }
     }
     val status by clipboard.status.collectAsState()
-    val missing = remember(revision, status) { PermissionChecks.missing(context, clipboard) }
+    val missing = remember(revision, status, clipboardReadElsewhere) {
+        PermissionChecks.missing(context, clipboard, clipboardReadElsewhere)
+    }
     return remember(missing) {
         PermissionsController(missing) { requirement ->
             when (requirement) {

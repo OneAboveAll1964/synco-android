@@ -6,6 +6,7 @@ import app.synco.clipboard.ClipDataBuilder
 import app.synco.clipboard.ClipboardCapture
 import app.synco.clipboard.ClipboardCaptureHub
 import app.synco.clipboard.ClipboardReader
+import app.synco.clipboard.ManualClips
 import app.synco.clipboard.ClipboardWriter
 import app.synco.clipboard.SuppressionWindow
 
@@ -28,6 +29,8 @@ internal class ClipboardLayer(
     private val hub = ClipboardCaptureHub(reader, suppression, maxBlobBytes, captureWaitMillis)
 
     val capture: ClipboardCapture = hub
+
+    val manual = ManualClips(transfers.blobs, transfers.metadata)
 
     val sink: ClipboardSink = ClipboardWriterSink(
         ClipboardWriter(clipboardManager, ClipDataBuilder(context), suppression),

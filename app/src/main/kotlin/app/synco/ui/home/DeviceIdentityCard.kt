@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import app.synco.R
 import app.synco.sync.DeviceIdentity
 import app.synco.ui.pairing.FingerprintBlocks
-import app.synco.ui.theme.SyncoTypography
+import app.synco.ui.theme.IdentifierStyle
 
 @Composable
 fun DeviceIdentityCard(
@@ -52,7 +52,7 @@ fun DeviceIdentityCard(
                 FingerprintBlocks(fingerprint = identity.fingerprint)
                 Text(
                     text = identity.deviceId.value,
-                    style = SyncoTypography.identifier,
+                    style = IdentifierStyle.value,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

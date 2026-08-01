@@ -19,6 +19,8 @@ internal class ClipReceiver(
 ) {
     private val held = InboundClipStore()
 
+    private val reports = PeerProgressReports()
+
     suspend fun onClip(clip: Clip) {
         if (clip.origin == selfDeviceId) return
         val policy = settings.policy
@@ -54,7 +56,13 @@ internal class ClipReceiver(
     suspend fun onBlob(chunk: BlobChunk) {
         val assembly = held.forTransfer(chunk.transferId) ?: return
         val failure = transfers.acceptChunk(chunk)
-        if (failure != null) fail(assembly, failure)
+        if (failure != null) {
+            fail(assembly, failure)
+            return
+        }
+        if (reports.shouldReport(chunk.transferId)) {
+            acknowledger.reportProgress(chunk.transferId, chunk.offset + chunk.data.size)
+        }
     }
 
     suspend fun onTransferEnd(end: TransferEnd) {

@@ -67,6 +67,7 @@ class HomeViewModel(
         graph.commands.setCaptureMode(mode)
     }
 
+
     override fun setShizukuPollMillis(millis: Long) {
         graph.commands.setShizukuPollMillis(millis)
     }
@@ -101,6 +102,14 @@ class HomeViewModel(
 
     override fun cancelTransfer(transferId: UUID) {
         graph.commands.cancelTransfer(transferId)
+    }
+
+    override fun sendText(value: String) {
+        graph.commands.sendText(value)
+    }
+
+    override fun sendFile(uri: android.net.Uri) {
+        graph.commands.sendFile(uri)
     }
 
     override fun resetIdentity() {

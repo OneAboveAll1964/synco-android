@@ -60,6 +60,7 @@ fun CaptureModeCard(
                         MaterialTheme.colorScheme.error
                     },
                 )
+                ShizukuAction(state = shizukuState)
             }
         }
     }

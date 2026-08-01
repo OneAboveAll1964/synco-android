@@ -6,6 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 internal class ClipboardPipeline(
+    private val readsElsewhere: () -> Boolean,
     private val capture: ClipboardCapture,
     private val dispatcher: OutboundClipDispatcher,
     private val state: SyncStateHolder,
@@ -20,6 +21,10 @@ internal class ClipboardPipeline(
     }
 
     private fun publishStatus(status: ClipboardCaptureStatus) {
+        if (readsElsewhere()) {
+            state.clear(SyncProblem.CLIPBOARD_UNREADABLE)
+            return
+        }
         if (status == ClipboardCaptureStatus.SERVICE_DISABLED) {
             state.raise(SyncProblem.CLIPBOARD_UNREADABLE)
         } else {

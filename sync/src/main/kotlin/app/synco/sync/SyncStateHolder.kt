@@ -53,7 +53,12 @@ class SyncStateHolder : SyncEventSink {
     }
 
     override fun record(event: SyncEvent) {
-        current.update { it.copy(lastEvent = event) }
+        current.update { state ->
+            state.copy(
+                lastEvent = event,
+                history = (listOf(event) + state.history).take(HISTORY_LIMIT),
+            )
+        }
     }
 
     fun clearPeers() {
@@ -65,5 +70,9 @@ class SyncStateHolder : SyncEventSink {
     private fun publishProblem() {
         val blocking = problems.value.minByOrNull { it.ordinal }
         current.update { it.copy(problem = blocking) }
+    }
+
+    private companion object {
+        const val HISTORY_LIMIT = 60
     }
 }
