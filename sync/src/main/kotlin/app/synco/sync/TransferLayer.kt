@@ -20,4 +20,6 @@ internal class TransferLayer(context: Context) {
     val gateway: TransferGateway = ManagedTransferGateway(manager)
 
     val blobs = BlobRepFactory(metadata, storage, manager)
+
+    val progress = manager.progress
 }

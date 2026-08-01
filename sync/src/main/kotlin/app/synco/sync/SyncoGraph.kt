@@ -11,6 +11,8 @@ import app.synco.transfer.DocumentTreeDestination
 import app.synco.transport.SyncoClient
 import app.synco.transport.SyncoSocketFactory
 import kotlinx.coroutines.CoroutineScope
+import app.synco.transfer.TransferProgress
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class SyncoGraph private constructor(
@@ -21,6 +23,7 @@ class SyncoGraph private constructor(
     val trustedPeers: TrustedPeerStore,
     val clipboard: ClipboardCapture,
     val captureTuning: CaptureTuningHolder,
+    val transferProgress: SharedFlow<TransferProgress>,
 ) {
     companion object {
         fun create(context: Context, scope: CoroutineScope): SyncoGraph {
@@ -94,6 +97,7 @@ class SyncoGraph private constructor(
                 trustedPeers = storage.trustedPeers,
                 clipboard = clipboard.capture,
                 captureTuning = captureTuning,
+                transferProgress = transfers.progress,
             )
         }
     }

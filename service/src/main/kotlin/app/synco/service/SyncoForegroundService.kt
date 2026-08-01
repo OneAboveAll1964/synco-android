@@ -17,6 +17,8 @@ class SyncoForegroundService : LifecycleService() {
 
     private val notifications by lazy { SyncoNotifications(this) }
 
+    private val transferNotifications by lazy { TransferNotifications(this) }
+
     private val locks by lazy { SyncoRuntimeLocks(this) }
 
     private val watcher by lazy { ClipboardChangeWatcher(this, lifecycleScope) }
@@ -36,8 +38,10 @@ class SyncoForegroundService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         notifications.createChannel()
+        transferNotifications.createChannel()
         lifecycleScope.launch { graph.state.collect(::publish) }
         watcher.start()
+        lifecycleScope.launch { graph.transferProgress.collect(transferNotifications::publish) }
         lifecycleScope.launch { shizuku.run() }
         lifecycleScope.launch { ShizukuStatus.publish(shizuku.state) }
     }
@@ -58,6 +62,7 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        transferNotifications.dismissAll()
         watcher.stop()
         syncing = false
         locks.release()

@@ -13,6 +13,7 @@ androidxDatastore = "1.1.7"
 androidxSecurity = "1.1.0-alpha06"
 androidxStartup = "1.2.0"
 composeBom = "2025.06.01"
+material3 = "1.4.0-alpha18"
 junit = "4.13.2"
 androidxTestJunit = "1.2.1"
 androidxTestCore = "1.6.1"
@@ -48,7 +49,7 @@ compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }

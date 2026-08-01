@@ -17,4 +17,8 @@
     <string name="synco_accessibility_label">Synco clipboard access</string>
     <string name="synco_accessibility_summary">Lets Synco read the clipboard while the app is in the background</string>
     <string name="synco_accessibility_description">Android only lets the app holding the current window read the clipboard. When you copy something, Synco briefly adds a tiny invisible window to take input focus for a few milliseconds, reads the clip, then removes it, so a copy you make in any app can reach your Mac. Synco reads only right after a copy and never reads, stores, or sends the contents of any screen.</string>
+    <string name="transfer_channel_name">File transfers</string>
+    <string name="transfer_channel_description">Progress while a large file moves between your devices.</string>
+    <string name="transfer_receiving">Receiving %1$s of %2$s</string>
+    <string name="transfer_sending">Sending %1$s of %2$s</string>
 </resources>
