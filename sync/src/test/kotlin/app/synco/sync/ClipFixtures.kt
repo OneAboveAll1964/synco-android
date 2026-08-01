@@ -69,6 +69,17 @@ internal object ClipFixtures {
         events: SyncEventSink = RecordingEvents(),
         destination: ReceivedFileDestination = NoReceivedFileDestination(),
         announcer: ReceivedFileAnnouncer = RecordingAnnouncer(),
-    ): ClipRouter =
-        ClipRouter(SELF, link, settings, clipboard, transfers, blobs, events, destination, announcer)
+        shizuku: ShizukuStartSink = ShizukuStartSink.NONE,
+    ): ClipRouter = ClipRouter(
+        SELF,
+        link,
+        settings,
+        clipboard,
+        transfers,
+        blobs,
+        events,
+        destination,
+        announcer,
+        shizuku,
+    )
 }
