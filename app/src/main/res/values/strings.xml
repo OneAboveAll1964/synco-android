@@ -26,7 +26,7 @@
     <string name="peer_reconnect">Reconnect</string>
     <string name="peer_forget">Forget</string>
     <string name="peer_caps_notice">%1$s is not accepting: %2$s</string>
-    <string name="peer_unpaired_note">Not paired yet. Once this device is paired you can choose what it sends and accepts.</string>
+    <string name="peer_unpaired_note">Not paired yet. Open Synco on your Mac and press Pair there, then approve it here.</string>
 
     <string name="peer_status_offline">Offline</string>
     <string name="peer_status_discovered">Found on this network</string>

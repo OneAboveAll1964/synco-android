@@ -7,4 +7,10 @@ internal object CaptureOwner {
 
     fun shizukuHasIt(mode: CaptureMode?, state: ShizukuState): Boolean =
         mode == CaptureMode.SHIZUKU && state.isUsable
+
+    fun accessibilityShouldCapture(
+        syncIsOn: Boolean,
+        mode: CaptureMode?,
+        state: ShizukuState,
+    ): Boolean = syncIsOn && !shizukuHasIt(mode, state)
 }

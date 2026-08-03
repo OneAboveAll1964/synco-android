@@ -41,6 +41,8 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
 
     private val rejected = MutableStateFlow(false)
 
+    private val trusted = MutableStateFlow(false)
+
     @Volatile
     private var pairing = false
 
@@ -60,6 +62,7 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
 
     fun setTrusted(record: TrustedPeer?) {
         rejected.value = record?.rejected == true
+        trusted.value = record?.isTrusted == true
         current.update {
             it.copy(
                 trusted = record?.isTrusted == true,
@@ -109,13 +112,22 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
         pairing -> PeerConnectionStatus.PAIRING
         rejected.value -> PeerConnectionStatus.REJECTED
         discovered.value == null -> PeerConnectionStatus.OFFLINE
+        !trusted.value -> PeerConnectionStatus.WAITING
         role.dials -> PeerConnectionStatus.DISCOVERED
         else -> PeerConnectionStatus.WAITING
     }
 
     fun dialTargets(live: Flow<Boolean>): Flow<DiscoveredPeer> =
-        combine(discovered, rejected, live) { peer, isRejected, isLive ->
-            peer.takeIf { DialRule.intentOf(role, peer != null, isRejected, isLive) == PeerIntent.DIAL }
+        combine(discovered, rejected, live, trusted) { peer, isRejected, isLive, isTrusted ->
+            peer.takeIf {
+                DialRule.intentOf(
+                    role = role,
+                    discovered = peer != null,
+                    rejected = isRejected,
+                    live = isLive,
+                    trusted = isTrusted,
+                ) == PeerIntent.DIAL
+            }
         }.filterNotNull()
 
     fun disappearances(): Flow<Unit> = discovered.filter { it == null }.map { }

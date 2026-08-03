@@ -49,7 +49,7 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val detector = detector ?: return
-        if (shizukuOwnsCapture()) return
+        if (!isCapturing()) return
         val signal = AccessibilitySignals.of(event) ?: return
         val triggered = detector.observe(signal)
         SyncoLog.clipboard.info(
@@ -60,7 +60,7 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
     }
 
     override suspend fun captureThroughFocus() {
-        if (shizukuOwnsCapture()) return
+        if (!isCapturing()) return
         val gate = gate ?: return
         val capture = capture ?: return
         val captured = captureLock.withLock {
@@ -70,8 +70,11 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
         if (captured) detector?.captured()
     }
 
-    private fun shizukuOwnsCapture(): Boolean =
-        CaptureOwner.shizukuHasIt(tuning?.mode(), ShizukuStatus.state.value)
+    private fun isCapturing(): Boolean = CaptureOwner.accessibilityShouldCapture(
+        syncIsOn = CaptureSwitch.isOn.value,
+        mode = tuning?.mode(),
+        state = ShizukuStatus.state.value,
+    )
 
     override fun onInterrupt() = Unit
 

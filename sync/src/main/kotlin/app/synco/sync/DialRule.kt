@@ -13,8 +13,10 @@ internal object DialRule {
         discovered: Boolean,
         rejected: Boolean,
         live: Boolean,
+        trusted: Boolean,
     ): PeerIntent = when {
         live || rejected || !discovered -> PeerIntent.IDLE
+        !trusted -> PeerIntent.WAIT
         role.dials -> PeerIntent.DIAL
         else -> PeerIntent.WAIT
     }

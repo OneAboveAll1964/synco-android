@@ -23,11 +23,43 @@ class SessionRoleTest {
     @Test
     fun `nothing is dialled for an undiscovered rejected or already live peer`() {
         val dialing = DialRule.roleFor(smaller, larger)
-        assertEquals(PeerIntent.IDLE, DialRule.intentOf(dialing, discovered = false, rejected = false, live = false))
-        assertEquals(PeerIntent.IDLE, DialRule.intentOf(dialing, discovered = true, rejected = true, live = false))
-        assertEquals(PeerIntent.IDLE, DialRule.intentOf(dialing, discovered = true, rejected = false, live = true))
+        assertEquals(
+            PeerIntent.IDLE,
+            DialRule.intentOf(dialing, discovered = false, rejected = false, live = false, trusted = true),
+        )
+        assertEquals(
+            PeerIntent.IDLE,
+            DialRule.intentOf(dialing, discovered = true, rejected = true, live = false, trusted = true),
+        )
+        assertEquals(
+            PeerIntent.IDLE,
+            DialRule.intentOf(dialing, discovered = true, rejected = false, live = true, trusted = true),
+        )
         val waiting = DialRule.roleFor(larger, smaller)
-        assertEquals(PeerIntent.IDLE, DialRule.intentOf(waiting, discovered = true, rejected = false, live = true))
+        assertEquals(
+            PeerIntent.IDLE,
+            DialRule.intentOf(waiting, discovered = true, rejected = false, live = true, trusted = true),
+        )
+    }
+
+    @Test
+    fun `an unpaired Mac is never dialled, so pairing always starts on the Mac`() {
+        val dialing = DialRule.roleFor(smaller, larger)
+
+        assertEquals(
+            PeerIntent.WAIT,
+            DialRule.intentOf(dialing, discovered = true, rejected = false, live = false, trusted = false),
+        )
+    }
+
+    @Test
+    fun `a paired Mac is dialled again so it reconnects on its own`() {
+        val dialing = DialRule.roleFor(smaller, larger)
+
+        assertEquals(
+            PeerIntent.DIAL,
+            DialRule.intentOf(dialing, discovered = true, rejected = false, live = false, trusted = true),
+        )
     }
 
     @Test
@@ -69,5 +101,6 @@ class SessionRoleTest {
         discovered = true,
         rejected = false,
         live = false,
+        trusted = true,
     )
 }
