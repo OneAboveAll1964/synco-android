@@ -7,9 +7,13 @@ import android.view.inputmethod.InputMethodManager
 internal object InputMethodPackages {
 
     fun of(context: Context): Set<String> = buildSet {
+        addAll(keyboardsOf(context))
+        add(SYSTEM_UI)
+    }
+
+    fun keyboardsOf(context: Context): Set<String> = buildSet {
         defaultInputMethod(context)?.let(::add)
         addAll(enabledInputMethods(context))
-        add(SYSTEM_UI)
     }
 
     private fun defaultInputMethod(context: Context): String? = runCatching {

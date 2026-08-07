@@ -48,7 +48,7 @@ fun rememberPermissionsController(clipboardReadElsewhere: Boolean = false): Perm
                     context.open(ClipboardAccessBridge.settingsIntent(context))
 
                 PermissionRequirement.BATTERY_EXEMPTION ->
-                    context.open(BatteryOptimisation.settingsIntent())
+                    context.openBatteryRequest()
             }
         }
     }
@@ -56,4 +56,9 @@ fun rememberPermissionsController(clipboardReadElsewhere: Boolean = false): Perm
 
 private fun Context.open(intent: Intent) {
     startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+}
+
+private fun Context.openBatteryRequest() {
+    val asked = runCatching { open(BatteryOptimisation.requestIntent(this)) }.isSuccess
+    if (!asked) runCatching { open(BatteryOptimisation.settingsIntent()) }
 }

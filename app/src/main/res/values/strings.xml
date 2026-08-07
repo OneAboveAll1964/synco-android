@@ -75,8 +75,8 @@
     <string name="clipboard_status_shizuku_working">Shizuku is reading the clipboard. Copy anything and Synco picks it up straight away.</string>
     <string name="clipboard_status_working">Background clipboard capture is working.</string>
     <string name="permission_battery_title">Exempt Synco from battery optimisation</string>
-    <string name="permission_battery_explanation">Battery optimisation can suspend the network connection while the screen is off, which makes copies arrive minutes late or not at all.</string>
-    <string name="permission_battery_action">Open battery settings</string>
+    <string name="permission_battery_explanation">Battery optimisation can suspend the network connection while the screen is off, which makes copies arrive minutes late or not at all. Synco will ask you right here, no digging through Settings.</string>
+    <string name="permission_battery_action">Allow background running</string>
 
     <string name="identity_reset_action">Create a new identity</string>
     <string name="identity_reset_title">Create a new identity?</string>

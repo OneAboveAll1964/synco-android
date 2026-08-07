@@ -41,32 +41,37 @@ class ShizukuCaptureLoop(
         ShizukuBinderWatch.observe(::refresh)
         launch { captureOnNudge() }
         while (true) {
-            val read = clipboard.read()
-            publish(availability.state { read })
-            delay(tick(read))
+            if (!enabled()) {
+                watch.stop()
+                publish(availability.stateWithoutReading())
+                delay(IDLE_MILLIS)
+                continue
+            }
+            publish(availability.state(clipboard::read))
+            delay(tick())
         }
     }
 
-    private suspend fun tick(read: ShizukuRead): Long {
-        if (!chosen() || !stateFlow.value.isUsable) {
+    private suspend fun tick(): Long {
+        if (!stateFlow.value.isUsable) {
             watch.stop()
-            return if (chosen()) UNAVAILABLE_MILLIS else IDLE_MILLIS
+            return UNAVAILABLE_MILLIS
         }
         val watching = watch.start { nudges.trySend(Unit) }
-        consider(read)
+        consider(clipboard.read())
         return if (watching) WATCHING_MILLIS else FALLBACK_POLL_MILLIS
     }
 
     private suspend fun captureOnNudge() {
         for (ignored in nudges) {
-            if (!chosen() || !stateFlow.value.isUsable) continue
+            if (!enabled() || !stateFlow.value.isUsable) continue
             consider(clipboard.read())
         }
     }
 
     fun stopWatching() = watch.stop()
 
-    private fun chosen(): Boolean = tuning.mode() == CaptureMode.SHIZUKU
+    private fun enabled(): Boolean = CaptureSwitch.isOn.value && tuning.mode() == CaptureMode.SHIZUKU
 
     private fun publish(next: ShizukuState) {
         if (next != stateFlow.value) SyncoLog.clipboard.info("Shizuku capture is $next")
@@ -74,7 +79,8 @@ class ShizukuCaptureLoop(
     }
 
     private fun refresh() {
-        stateFlow.value = availability.state(clipboard::read)
+        stateFlow.value =
+            if (enabled()) availability.state(clipboard::read) else availability.stateWithoutReading()
     }
 
     private suspend fun consider(read: ShizukuRead) {

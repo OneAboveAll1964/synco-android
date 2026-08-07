@@ -116,6 +116,7 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     private fun publish(state: SyncState) {
+        CaptureSwitch.set(state.running && !state.paused)
         if (syncing) notifications.update(state)
     }
 

@@ -3,6 +3,7 @@ package app.synco.clipboard
 class CopyIntentDetector(
     private val ownPackageName: String?,
     private val excludedPackages: () -> Set<String> = ::emptySet,
+    private val keyboardPackages: () -> Set<String> = ::emptySet,
     private val gestureWindowMillis: () -> Long = { DEFAULT_GESTURE_WINDOW_MILLIS },
     private val minIntervalMillis: Long = DEFAULT_MIN_INTERVAL_MILLIS,
     private val attemptsPerGesture: () -> Int = { DEFAULT_ATTEMPTS_PER_GESTURE },
@@ -16,7 +17,8 @@ class CopyIntentDetector(
     fun observe(signal: CopySignal): Boolean = when (signal.kind) {
         CopySignalKind.CLICK, CopySignalKind.LONG_CLICK, CopySignalKind.TEXT_SELECTION_CHANGED ->
             arm(signal)
-        CopySignalKind.WINDOW_STATE_CHANGED -> onWindowStateChanged(signal)
+        CopySignalKind.WINDOW_STATE_CHANGED -> trigger(signal)
+        CopySignalKind.COPY_TOAST -> onCopyToast(signal)
     }
 
     fun captured() {
@@ -31,15 +33,26 @@ class CopyIntentDetector(
         return false
     }
 
-    private fun onWindowStateChanged(signal: CopySignal): Boolean {
-        if (isOurs(signal) || isExcluded(signal)) return false
-        val armed = armedAtMillis ?: return false
-        if (signal.timestampMillis - armed !in 0..gestureWindowMillis()) return false
+    private fun trigger(signal: CopySignal): Boolean {
+        if (isOurs(signal) || isKeyboard(signal)) return false
+        if (!isArmedAt(signal.timestampMillis)) return false
         if (attemptsLeft <= 0) return false
         if (tooSoon(signal.timestampMillis)) return false
         attemptsLeft -= 1
         lastAttemptAtMillis = signal.timestampMillis
         return true
+    }
+
+    private fun onCopyToast(signal: CopySignal): Boolean {
+        if (isOurs(signal)) return false
+        if (!isArmedAt(signal.timestampMillis)) return false
+        lastAttemptAtMillis = signal.timestampMillis
+        return true
+    }
+
+    private fun isArmedAt(nowMillis: Long): Boolean {
+        val armed = armedAtMillis ?: return false
+        return nowMillis - armed in 0..gestureWindowMillis()
     }
 
     private fun tooSoon(nowMillis: Long): Boolean {
@@ -50,6 +63,8 @@ class CopyIntentDetector(
     private fun isOurs(signal: CopySignal): Boolean = signal.packageName == ownPackageName
 
     private fun isExcluded(signal: CopySignal): Boolean = signal.packageName in excludedPackages()
+
+    private fun isKeyboard(signal: CopySignal): Boolean = signal.packageName in keyboardPackages()
 
     companion object {
         const val DEFAULT_GESTURE_WINDOW_MILLIS = 8_000L

@@ -12,6 +12,8 @@ internal class SettingsSnapshot(preferences: Preferences, fallbackDisplayName: S
 
     val launchOnBoot: Boolean = preferences[StorageKeys.LAUNCH_ON_BOOT] ?: false
 
+    val syncRequested: Boolean = preferences[StorageKeys.SYNC_REQUESTED] ?: false
+
     val receivedFolder: String? = preferences[StorageKeys.RECEIVED_FOLDER]?.takeIf { it.isNotBlank() }
 
     val captureMode: CaptureMode = CaptureMode.parse(preferences[StorageKeys.CAPTURE_MODE])

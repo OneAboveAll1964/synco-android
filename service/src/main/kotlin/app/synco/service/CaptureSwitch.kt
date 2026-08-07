@@ -10,11 +10,11 @@ object CaptureSwitch {
 
     val isOn: StateFlow<Boolean> = current.asStateFlow()
 
-    fun turnOn() {
-        current.value = true
+    fun set(on: Boolean) {
+        current.value = on
     }
 
-    fun turnOff() {
-        current.value = false
-    }
+    fun turnOn() = set(true)
+
+    fun turnOff() = set(false)
 }

@@ -24,6 +24,13 @@ class ShizukuAvailability(context: Context) {
 
     fun isInstalled(): Boolean = install.isInstalled(everSawBinder || isRunning())
 
+    fun stateWithoutReading(): ShizukuState {
+        if (!isRunning()) {
+            return if (isInstalled()) ShizukuState.NOT_RUNNING else ShizukuState.NOT_INSTALLED
+        }
+        return if (isGranted()) ShizukuState.READY else ShizukuState.PERMISSION_DENIED
+    }
+
     fun state(probe: () -> ShizukuRead): ShizukuState {
         if (!isRunning()) {
             return if (isInstalled()) ShizukuState.NOT_RUNNING else ShizukuState.NOT_INSTALLED

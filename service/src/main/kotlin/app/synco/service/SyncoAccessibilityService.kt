@@ -35,19 +35,25 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
         val tuning = syncoGraphOrNull()?.captureTuning
         this.tuning = tuning
         gate = FocusGate(this) { tuning?.focusTimeoutMillis() ?: DEFAULT_FOCUS_TIMEOUT }
-        val keyboards = InputMethodPackages.of(this)
+        val excluded = InputMethodPackages.of(this)
+        val keyboards = InputMethodPackages.keyboardsOf(this)
         detector = CopyIntentDetector(
             ownPackageName = packageName,
-            excludedPackages = { keyboards },
+            excludedPackages = { excluded },
+            keyboardPackages = { keyboards },
             gestureWindowMillis = { tuning?.gestureWindowMillis() ?: DEFAULT_GESTURE_WINDOW },
             attemptsPerGesture = { tuning?.attemptsPerGesture() ?: DEFAULT_ATTEMPTS },
         )
+        if (EventFirehose.isEnabled) {
+            serviceInfo = EventFirehose.widen(serviceInfo)
+        }
         capture = syncoGraphOrNull()?.clipboard?.also { it.setAccessibilityConnected(true) }
         FocusGateHolder.install(this)
         SyncoLog.clipboard.info("focus gate is ready")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        EventFirehose.log(event)
         val detector = detector ?: return
         if (!isCapturing()) return
         val signal = AccessibilitySignals.of(event) ?: return
@@ -71,10 +77,15 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
     }
 
     private fun isCapturing(): Boolean = CaptureOwner.accessibilityShouldCapture(
-        syncIsOn = CaptureSwitch.isOn.value,
+        syncIsOn = syncIsOn(),
         mode = tuning?.mode(),
         state = ShizukuStatus.state.value,
     )
+
+    private fun syncIsOn(): Boolean {
+        val state = syncoGraphOrNull()?.state?.value ?: return CaptureSwitch.isOn.value
+        return state.running && !state.paused
+    }
 
     override fun onInterrupt() = Unit
 

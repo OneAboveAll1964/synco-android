@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 internal object StorageKeys {
     val DISPLAY_NAME = stringPreferencesKey("display_name")
     val LAUNCH_ON_BOOT = booleanPreferencesKey("launch_on_boot")
+    val SYNC_REQUESTED = booleanPreferencesKey("sync_requested")
     val PAUSED = booleanPreferencesKey("paused")
     val MAX_BLOB_BYTES = longPreferencesKey("max_blob_bytes")
     val DEFAULT_DIRECTIONS = stringPreferencesKey("default_directions")

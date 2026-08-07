@@ -5,4 +5,5 @@ enum class CopySignalKind {
     LONG_CLICK,
     TEXT_SELECTION_CHANGED,
     WINDOW_STATE_CHANGED,
+    COPY_TOAST,
 }

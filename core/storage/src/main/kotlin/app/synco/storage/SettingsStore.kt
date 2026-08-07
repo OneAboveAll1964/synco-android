@@ -9,6 +9,8 @@ interface SettingsStore {
 
     val launchOnBoot: Flow<Boolean>
 
+    val syncRequested: Flow<Boolean>
+
     val receivedFolder: Flow<String?>
 
     val captureTuning: Flow<CaptureTuning>
@@ -29,6 +31,8 @@ interface SettingsStore {
     suspend fun setDisplayName(displayName: String)
 
     suspend fun setLaunchOnBoot(enabled: Boolean)
+
+    suspend fun setSyncRequested(requested: Boolean)
 
     suspend fun setReceivedFolder(treeUri: String?)
 

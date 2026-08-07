@@ -26,6 +26,9 @@ class DataStoreSettingsStore internal constructor(
     override val launchOnBoot: Flow<Boolean> =
         snapshots.map { it.launchOnBoot }.distinctUntilChanged()
 
+    override val syncRequested: Flow<Boolean> =
+        snapshots.map { it.syncRequested }.distinctUntilChanged()
+
     override val receivedFolder: Flow<String?> =
         snapshots.map { it.receivedFolder }.distinctUntilChanged()
 
@@ -56,6 +59,10 @@ class DataStoreSettingsStore internal constructor(
 
     override suspend fun setLaunchOnBoot(enabled: Boolean) = write { preferences ->
         preferences[StorageKeys.LAUNCH_ON_BOOT] = enabled
+    }
+
+    override suspend fun setSyncRequested(requested: Boolean) = write { preferences ->
+        preferences[StorageKeys.SYNC_REQUESTED] = requested
     }
 
     override suspend fun setReceivedFolder(treeUri: String?) = write { preferences ->

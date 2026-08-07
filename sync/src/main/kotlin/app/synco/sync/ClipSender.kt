@@ -1,6 +1,7 @@
 package app.synco.sync
 
 import app.synco.clipboard.ClipboardSnapshot
+import app.synco.logging.SyncoLog
 import app.synco.protocol.DeviceId
 import app.synco.protocol.clip.ClipHash
 import app.synco.protocol.message.Clip
