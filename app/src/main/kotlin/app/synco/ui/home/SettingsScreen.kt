@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 fun SettingsScreen(
     state: HomeUiState,
     actions: HomeActions,
-    onQRScanned: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -30,7 +29,6 @@ fun SettingsScreen(
             displayName = state.displayName,
             onDisplayNameChange = actions::setDisplayName,
         )
-        QRPairCard(onScanned = onQRScanned)
         ReceivedFolderCard(
             receivedFolder = state.receivedFolder,
             onFolderChosen = actions::setReceivedFolder,

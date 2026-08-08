@@ -118,9 +118,9 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
     fun idleStatus(): PeerConnectionStatus = when {
         pairing -> PeerConnectionStatus.PAIRING
         rejected.value -> PeerConnectionStatus.REJECTED
-        discovered.value == null -> PeerConnectionStatus.OFFLINE
-        !trusted.value -> PeerConnectionStatus.WAITING
-        role.dials -> PeerConnectionStatus.DISCOVERED
+        discovered.value == null && manual.value == null -> PeerConnectionStatus.OFFLINE
+        !trusted.value && manual.value == null -> PeerConnectionStatus.WAITING
+        role.dials || manual.value != null -> PeerConnectionStatus.DISCOVERED
         else -> PeerConnectionStatus.WAITING
     }
 
@@ -132,6 +132,7 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
                 rejected = isRejected,
                 live = isLive,
                 trusted = isTrusted,
+                adoptedManually = fallback != null,
             )
             when {
                 peer != null && intent == PeerIntent.DIAL -> peer

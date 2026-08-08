@@ -64,6 +64,19 @@ fun SyncoApp(modifier: Modifier = Modifier) {
         snackbars.showSnackbar(resources.getString(shizukuStartMessageRes(report)))
         model.clearShizukuStart()
     }
+    val onQRScanned: (String) -> Unit = { text ->
+        val payload = QRPairPayload.parse(text)
+        scope.launch {
+            if (payload == null) {
+                snackbars.showSnackbar(resources.getString(R.string.qr_pair_bad_code))
+            } else {
+                model.pairWithQR(payload)
+                snackbars.showSnackbar(
+                    resources.getString(R.string.qr_pair_done, payload.displayName),
+                )
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -107,25 +120,13 @@ fun SyncoApp(modifier: Modifier = Modifier) {
                 statusText = homeStatusText(state),
                 permissions = permissions,
                 actions = model,
+                onQRScanned = onQRScanned,
                 modifier = Modifier.padding(insets),
             )
 
             SyncoDestination.SETTINGS -> SettingsScreen(
                 state = state,
                 actions = model,
-                onQRScanned = { text ->
-                    val payload = QRPairPayload.parse(text)
-                    scope.launch {
-                        if (payload == null) {
-                            snackbars.showSnackbar(resources.getString(R.string.qr_pair_bad_code))
-                        } else {
-                            model.pairWithQR(payload)
-                            snackbars.showSnackbar(
-                                resources.getString(R.string.qr_pair_done, payload.displayName),
-                            )
-                        }
-                    }
-                },
                 modifier = Modifier.padding(insets),
             )
         }

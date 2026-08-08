@@ -53,6 +53,34 @@ class SessionRoleTest {
     }
 
     @Test
+    fun `a QR-adopted Mac is dialled even when the role says wait`() {
+        val waiting = DialRule.roleFor(larger, smaller)
+
+        assertEquals(
+            PeerIntent.DIAL,
+            DialRule.intentOf(
+                role = waiting,
+                discovered = true,
+                rejected = false,
+                live = false,
+                trusted = true,
+                adoptedManually = true,
+            ),
+        )
+        assertEquals(
+            PeerIntent.IDLE,
+            DialRule.intentOf(
+                role = waiting,
+                discovered = true,
+                rejected = false,
+                live = true,
+                trusted = true,
+                adoptedManually = true,
+            ),
+        )
+    }
+
+    @Test
     fun `a paired Mac is dialled again so it reconnects on its own`() {
         val dialing = DialRule.roleFor(smaller, larger)
 
