@@ -146,8 +146,9 @@
     <string name="shizuku_start_not_installed">Install Shizuku on this phone first.</string>
     <string name="shizuku_start_no_starter">Your computer could not find Shizuku’s starter. Update Shizuku and try again.</string>
     <string name="tab_service">Service</string>
-    <string name="qr_pair_title">Pair with your Mac by QR code</string>
-    <string name="qr_pair_body">On the Mac, open Synco and press Pair by QR. Works even on networks that block device discovery.</string>
+    <string name="live_update_title">Pin transfer progress to the status bar</string>
+    <string name="live_update_body">Your phone is currently blocking Synco\u2019s live progress pill. Allow live updates for Synco in notification settings to see transfers in the status bar.</string>
+    <string name="live_update_action">Open notification settings</string>
     <string name="qr_pair_button">Scan the code</string>
     <string name="qr_pair_done">Paired with %1$s. Connecting…</string>
     <string name="qr_pair_bad_code">That is not a Synco pairing code.</string>

@@ -21,7 +21,6 @@ fun ServiceScreen(
     statusText: String,
     permissions: PermissionsController,
     actions: HomeActions,
-    onQRScanned: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -62,6 +61,6 @@ fun ServiceScreen(
             TransferList(transfers = state.transfers, onCancel = actions::cancelTransfer)
         }
         PeerList(peers = state.peers, actions = actions)
-        QRPairCard(onScanned = onQRScanned)
+        LiveUpdateCard()
     }
 }

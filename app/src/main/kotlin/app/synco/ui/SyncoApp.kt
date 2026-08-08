@@ -35,6 +35,7 @@ import app.synco.sync.QRPairPayload
 import app.synco.ui.home.HomeScreen
 import app.synco.ui.home.HomeViewModel
 import app.synco.ui.home.HomeViewModelFactory
+import app.synco.ui.home.QRPairFab
 import app.synco.ui.home.SendSheet
 import app.synco.ui.home.ServiceScreen
 import app.synco.ui.home.SettingsScreen
@@ -98,13 +99,16 @@ fun SyncoApp(modifier: Modifier = Modifier) {
             }
         },
         floatingActionButton = {
-            if (destination == SyncoDestination.HOME) {
-                FloatingActionButton(onClick = { sending = true }) {
+            when (destination) {
+                SyncoDestination.HOME -> FloatingActionButton(onClick = { sending = true }) {
                     Icon(
                         imageVector = Icons.Filled.Send,
                         contentDescription = stringResource(R.string.send_title),
                     )
                 }
+
+                SyncoDestination.SERVICE -> QRPairFab(onScanned = onQRScanned)
+                SyncoDestination.SETTINGS -> Unit
             }
         },
     ) { insets ->
@@ -120,7 +124,6 @@ fun SyncoApp(modifier: Modifier = Modifier) {
                 statusText = homeStatusText(state),
                 permissions = permissions,
                 actions = model,
-                onQRScanned = onQRScanned,
                 modifier = Modifier.padding(insets),
             )
 
