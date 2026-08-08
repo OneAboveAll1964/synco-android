@@ -38,6 +38,16 @@ fun LiveUpdateCard(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            if (isSamsung()) {
+                Text(
+                    text = stringResource(R.string.live_update_samsung),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                TextButton(onClick = { openDeveloperOptions(context) }) {
+                    Text(text = stringResource(R.string.live_update_samsung_action))
+                }
+            }
             TextButton(onClick = { openNotificationSettings(context) }) {
                 Text(text = stringResource(R.string.live_update_action))
             }
@@ -61,6 +71,14 @@ private fun openNotificationSettings(context: Context) {
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     runCatching { context.startActivity(fallback) }
+}
+
+private fun isSamsung(): Boolean = Build.MANUFACTURER.equals("samsung", ignoreCase = true)
+
+private fun openDeveloperOptions(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
 }
 
 private const val PROMOTED_SETTINGS_ACTION =

@@ -7,7 +7,7 @@ import app.synco.transfer.TransferManager
 import app.synco.transfer.TransferPaths
 import app.synco.transfer.TransferStorage
 
-internal class TransferLayer(context: Context) {
+internal class TransferLayer(context: Context, maxBlobBytes: () -> Long) {
 
     private val resolver = context.contentResolver
 
@@ -15,7 +15,7 @@ internal class TransferLayer(context: Context) {
 
     val metadata = ContentUriMetadata(resolver)
 
-    val manager = TransferManager(storage, resolver)
+    val manager = TransferManager(storage, resolver, maxBlobBytes)
 
     val gateway: TransferGateway = ManagedTransferGateway(manager)
 

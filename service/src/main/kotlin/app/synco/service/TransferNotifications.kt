@@ -15,6 +15,8 @@ class TransferNotifications(private val context: Context) {
 
     private val shown = mutableSetOf<Int>()
 
+    private val lastShownAt = HashMap<Int, Long>()
+
     fun createChannel() {
         manager?.deleteNotificationChannel(LEGACY_CHANNEL_ID)
         val channel = NotificationChannel(
@@ -39,7 +41,11 @@ class TransferNotifications(private val context: Context) {
             return
         }
         if (!progress.deservesNotification) return
+        val now = System.currentTimeMillis()
+        val fresh = id !in shown
+        if (!fresh && now - (lastShownAt[id] ?: 0L) < MIN_UPDATE_MILLIS) return
         shown += id
+        lastShownAt[id] = now
         manager?.notify(id, build(progress))
     }
 
@@ -53,6 +59,7 @@ class TransferNotifications(private val context: Context) {
     }
 
     private fun dismiss(id: Int) {
+        lastShownAt.remove(id)
         if (!shown.remove(id)) return
         manager?.cancel(id)
     }
@@ -85,5 +92,6 @@ class TransferNotifications(private val context: Context) {
         const val LEGACY_CHANNEL_ID = "synco_transfers"
         const val GROUP_KEY = "synco_transfers"
         const val PERCENT_TOTAL = 100
+        const val MIN_UPDATE_MILLIS = 500L
     }
 }

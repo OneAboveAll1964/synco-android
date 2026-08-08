@@ -149,6 +149,8 @@
     <string name="live_update_title">Pin transfer progress to the status bar</string>
     <string name="live_update_body">Your phone is currently blocking Synco\u2019s live progress pill. Allow live updates for Synco in notification settings to see transfers in the status bar.</string>
     <string name="live_update_action">Open notification settings</string>
+    <string name="live_update_samsung">On Samsung phones, also turn on Developer options \u2192 \u201cLive notifications for all apps\u201d, then reopen Synco.</string>
+    <string name="live_update_samsung_action">Open developer options</string>
     <string name="qr_pair_button">Scan the code</string>
     <string name="qr_pair_done">Paired with %1$s. Connecting…</string>
     <string name="qr_pair_bad_code">That is not a Synco pairing code.</string>

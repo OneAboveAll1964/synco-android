@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 class TransferManager(
     private val storage: TransferStorage,
     private val resolver: ContentResolver,
-    val maxBlobBytes: Long = ProtocolConstants.DEFAULT_MAX_BLOB_BYTES,
+    private val maxBlobBytes: () -> Long = { ProtocolConstants.DEFAULT_MAX_BLOB_BYTES },
 ) {
     private val stager = BlobStager(resolver, storage)
 
@@ -29,7 +29,7 @@ class TransferManager(
 
     fun begin(start: TransferStart, relativePath: String? = null): TransferFailure? {
         val transferId = TransferIds.parseOrNull(start.transferId) ?: return TransferFailure.UNKNOWN_TRANSFER
-        if (start.size < 0 || start.size > maxBlobBytes) return TransferFailure.TOO_LARGE
+        if (start.size < 0 || start.size > maxBlobBytes()) return TransferFailure.TOO_LARGE
         val transfer = IncomingTransfer(transferId, start, storage, relativePath)
         incoming.put(transferId, transfer)?.fail(TransferFailure.CLOSED)
         reporter.incoming(transfer, TransferProgress.State.STARTED)
@@ -69,8 +69,8 @@ class TransferManager(
     suspend fun stageBytes(
         transferId: UUID,
         source: TransferSource,
-        peerMaxBlobBytes: Long = maxBlobBytes,
-    ): StagedBlob? = stager.stage(transferId, source, minOf(peerMaxBlobBytes, maxBlobBytes))
+        peerMaxBlobBytes: Long = maxBlobBytes(),
+    ): StagedBlob? = stager.stage(transferId, source, minOf(peerMaxBlobBytes, maxBlobBytes()))
 
     fun adoptStaged(
         clipId: String,
@@ -94,10 +94,10 @@ class TransferManager(
     suspend fun stageOutgoing(
         clipId: String,
         source: TransferSource,
-        peerMaxBlobBytes: Long = maxBlobBytes,
+        peerMaxBlobBytes: Long = maxBlobBytes(),
         transferId: UUID = TransferIds.newId(),
     ): OutgoingTransfer? {
-        val cap = minOf(peerMaxBlobBytes, maxBlobBytes)
+        val cap = minOf(peerMaxBlobBytes, maxBlobBytes())
         val staged = stager.stage(transferId, source, cap) ?: return null
         val prepared = OutgoingTransfer.fromStaged(
             resolver = resolver,
@@ -114,7 +114,7 @@ class TransferManager(
     suspend fun prepareOutgoing(
         clipId: String,
         source: TransferSource,
-        peerMaxBlobBytes: Long = maxBlobBytes,
+        peerMaxBlobBytes: Long = maxBlobBytes(),
         transferId: UUID = TransferIds.newId(),
     ): OutgoingTransfer? {
         val prepared = runCatching { OutgoingTransfer.prepare(resolver, clipId, source, transferId) }

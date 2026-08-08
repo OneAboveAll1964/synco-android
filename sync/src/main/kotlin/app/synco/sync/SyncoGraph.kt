@@ -35,8 +35,8 @@ class SyncoGraph private constructor(
         fun create(context: Context, scope: CoroutineScope): SyncoGraph {
             val application = context.applicationContext
             val storage = SyncoStorage.create(application)
-            val transfers = TransferLayer(application)
             val blobLimit = BlobSizeLimit(storage.settings, scope)
+            val transfers = TransferLayer(application, blobLimit::bytes)
             val captureTuning = CaptureTuningHolder(storage.settings, scope)
             val clipboard = ClipboardLayer(application, transfers, blobLimit::bytes, captureTuning::waitMillis)
             val state = SyncStateHolder()
