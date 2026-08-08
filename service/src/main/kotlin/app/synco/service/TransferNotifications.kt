@@ -92,6 +92,6 @@ class TransferNotifications(private val context: Context) {
         const val LEGACY_CHANNEL_ID = "synco_transfers"
         const val GROUP_KEY = "synco_transfers"
         const val PERCENT_TOTAL = 100
-        const val MIN_UPDATE_MILLIS = 500L
+        const val MIN_UPDATE_MILLIS = 1_000L
     }
 }
