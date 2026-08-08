@@ -14,11 +14,10 @@ import java.util.UUID
 
 class ClipboardCaptureHub(
     private val reader: ClipboardReader,
-    private val suppression: SuppressionWindow,
+    private val generation: ClipboardGeneration,
     private val maxBlobBytes: () -> Long = { ProtocolConstants.DEFAULT_MAX_BLOB_BYTES },
     captureWaitMillis: () -> Long = { ClipSettle.DEFAULT_BUDGET_MILLIS },
     private val staged: StagedBlobs = StagedBlobs.NONE,
-    private val repeats: RepeatCaptureGuard = RepeatCaptureGuard(),
 ) : ClipboardCapture {
 
     private val emissions = MutableSharedFlow<CapturedClip>(
@@ -71,14 +70,11 @@ class ClipboardCaptureHub(
     }
 
     private fun accept(candidate: ClipboardSnapshot, stampMillis: Long?): ClipboardSnapshot? {
-        if (suppression.consume(candidate.hash)) {
-            SyncoLog.clipboard.debug { "ignored a clip we had just written locally" }
+        if (generation.isKnown(candidate.hash, stampMillis)) {
+            SyncoLog.clipboard.debug { "ignored a clip this generation already covers" }
             return discard(candidate)
         }
-        if (repeats.isRepeat(candidate.hash, stampMillis)) {
-            SyncoLog.clipboard.debug { "ignored a second read of the copy we already captured" }
-            return discard(candidate)
-        }
+        generation.captured(candidate.hash, stampMillis)
         return candidate
     }
 

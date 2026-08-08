@@ -8,8 +8,8 @@ import app.synco.clipboard.ClipboardCaptureHub
 import app.synco.clipboard.ClipboardReader
 import app.synco.clipboard.ManualClips
 import app.synco.clipboard.ClipboardWriter
+import app.synco.clipboard.ClipboardGeneration
 import app.synco.clipboard.StagedBlobs
-import app.synco.clipboard.SuppressionWindow
 
 internal class ClipboardLayer(
     context: Context,
@@ -23,13 +23,13 @@ internal class ClipboardLayer(
             "this device has no ClipboardManager"
         }
 
-    private val suppression = SuppressionWindow()
+    private val generation = ClipboardGeneration()
 
     private val reader = ClipboardReader(clipboardManager, transfers.blobs, transfers.metadata)
 
     private val hub = ClipboardCaptureHub(
         reader = reader,
-        suppression = suppression,
+        generation = generation,
         maxBlobBytes = maxBlobBytes,
         captureWaitMillis = captureWaitMillis,
         staged = StagedBlobs { snapshot ->
@@ -42,6 +42,6 @@ internal class ClipboardLayer(
     val manual = ManualClips(transfers.blobs, transfers.metadata)
 
     val sink: ClipboardSink = ClipboardWriterSink(
-        ClipboardWriter(clipboardManager, ClipDataBuilder(context), suppression),
+        ClipboardWriter(clipboardManager, ClipDataBuilder(context), generation),
     )
 }

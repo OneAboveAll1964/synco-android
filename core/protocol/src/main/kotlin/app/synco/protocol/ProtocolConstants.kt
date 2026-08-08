@@ -30,8 +30,6 @@ object ProtocolConstants {
     const val READ_TIMEOUT_MILLIS = 45_000L
     const val PAIR_TIMEOUT_MILLIS = 120_000L
 
-    const val SUPPRESSION_WINDOW_MILLIS = 10_000L
-    const val SUPPRESSION_MAX_ENTRIES = 32
 
     const val CANONICAL_UNIT_SEPARATOR: Byte = 0x1F
     const val CANONICAL_RECORD_SEPARATOR: Byte = 0x1E
