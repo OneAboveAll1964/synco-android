@@ -4,6 +4,7 @@ import app.synco.protocol.DeviceId
 import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
+import app.synco.sync.QRPairPayload
 import app.synco.sync.SyncDirection
 import java.util.UUID
 
@@ -24,6 +25,8 @@ interface HomeActions {
     fun setCaptureTuning(tuning: CaptureTuning)
 
     fun setCaptureMode(mode: CaptureMode)
+
+    fun pairWithQR(payload: QRPairPayload)
 
 
     fun setDirection(deviceId: DeviceId, direction: SyncDirection)

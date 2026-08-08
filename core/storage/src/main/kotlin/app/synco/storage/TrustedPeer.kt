@@ -19,6 +19,8 @@ data class TrustedPeer(
     @SerialName("pl") val platform: Platform,
     @SerialName("pairedAt") val firstPairedAtMillis: Long,
     @SerialName("rejected") val rejected: Boolean = false,
+    @SerialName("mHost") val manualHosts: String? = null,
+    @SerialName("mPort") val manualPort: Int? = null,
 ) {
     val isTrusted: Boolean get() = !rejected
 
@@ -29,6 +31,9 @@ data class TrustedPeer(
             ?.takeIf { it.size == HandshakeConstants.X25519_KEY_BYTES }
 
     val fingerprint: Fingerprint? get() = staticPublicKeyBytes?.let(PeerIdentity::fingerprintOf)
+
+    val manualHostList: List<String>
+        get() = manualHosts?.split(',')?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
 
     val keyMatchesDeviceId: Boolean
         get() = staticPublicKeyBytes?.let { PeerIdentity.matches(it, deviceId) } == true

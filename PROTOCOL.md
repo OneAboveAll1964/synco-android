@@ -254,12 +254,26 @@ When a side receives `hello` from a `did` it does not trust, it replies:
 
 ```json
 { "t": "pairRequest", "did": "...", "dn": "...", "pl": "macos",
-  "sPub": "<base64 32B>", "fp": "A1B2-C3D4-E5F6-0718" }
+  "sPub": "<base64 32B>", "fp": "A1B2-C3D4-E5F6-0718", "tok": "<optional>" }
 ```
 
 and, without waiting, surfaces the peer to its own user for approval. Each side shows the
 peer's `dn` and `fp` and requires an explicit approve. `sPub` must hash to the claimed
 `did` per §1 or the request is dropped as `didMismatch`.
+
+`tok` is optional and carries a one-time QR pairing token. A device that is displaying a
+QR pairing code treats a `pairRequest` whose `tok` equals the displayed token as already
+approved by its user — showing the code is the consent — and consumes the token. Devices
+never persist tokens and ignore an unknown or absent `tok`, falling back to the normal
+approval flow. The QR payload itself is a URI:
+
+```
+synco://pair?v=1&did=<deviceId>&key=<base64url sPub>&fp=<fingerprint>&name=<urlencoded>&port=<tcp port>&hosts=<ip[,ip...]>&tok=<token>
+```
+
+The scanning device verifies that `key` hashes to `did` and to `fp` per §1, stores the peer
+as trusted, and dials `hosts:port` directly, which also covers networks where mDNS is
+blocked.
 
 Once its user approves, a side sends:
 

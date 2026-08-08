@@ -9,6 +9,7 @@ import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
 import app.synco.sync.ShizukuStartReport
+import app.synco.sync.QRPairPayload
 import app.synco.sync.SyncDirection
 import app.synco.sync.SyncoGraph
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,6 +93,10 @@ class HomeViewModel(
 
     override fun setCaptureTuning(tuning: CaptureTuning) {
         graph.commands.setCaptureTuning(tuning)
+    }
+
+    override fun pairWithQR(payload: QRPairPayload) {
+        graph.commands.adoptQRPeer(payload)
     }
 
     override fun setCaptureMode(mode: CaptureMode) {

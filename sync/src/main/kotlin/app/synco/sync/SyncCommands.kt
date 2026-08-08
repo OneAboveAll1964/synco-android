@@ -3,13 +3,16 @@ package app.synco.sync
 import app.synco.clipboard.CaptureRoute
 import app.synco.clipboard.ClipboardCapture
 import app.synco.protocol.DeviceId
+import app.synco.protocol.Platform
 import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
 import app.synco.storage.ClipCategory
 import app.synco.storage.IdentityStore
 import app.synco.storage.PeerDirections
 import app.synco.storage.SettingsStore
+import app.synco.storage.TrustedPeer
 import app.synco.storage.TrustedPeerStore
+import app.synco.transport.PairTokens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -78,6 +81,23 @@ class SyncCommands internal constructor(
 
     fun reconnectPeer(deviceId: DeviceId) {
         engine.reconnect(deviceId)
+    }
+
+    fun adoptQRPeer(payload: QRPairPayload) = fire {
+        trustedPeers.add(
+            TrustedPeer(
+                deviceId = payload.deviceId,
+                staticPublicKey = payload.staticPublicKey,
+                displayName = payload.displayName,
+                platform = Platform.MACOS,
+                firstPairedAtMillis = System.currentTimeMillis(),
+                manualHosts = payload.hosts.joinToString(","),
+                manualPort = payload.port,
+            ),
+        )
+        PairTokens.offer(payload.deviceId, payload.token)
+        events.record(SyncEvent.of(SyncEvent.Kind.PEER_PAIRED, payload.deviceId, payload.displayName))
+        engine.reconnect(payload.deviceId)
     }
 
     fun requestShizukuStart(deviceId: DeviceId) = fire {

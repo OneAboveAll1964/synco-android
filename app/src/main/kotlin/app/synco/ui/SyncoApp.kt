@@ -22,13 +22,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import app.synco.R
 import app.synco.storage.CaptureMode
+import app.synco.sync.QRPairPayload
 import app.synco.ui.home.HomeScreen
 import app.synco.ui.home.HomeViewModel
 import app.synco.ui.home.HomeViewModelFactory
@@ -54,6 +57,7 @@ fun SyncoApp(modifier: Modifier = Modifier) {
     var sending by remember { mutableStateOf(false) }
 
     val snackbars = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val resources = LocalContext.current.resources
     LaunchedEffect(state.shizukuStart) {
         val report = state.shizukuStart ?: return@LaunchedEffect
@@ -109,6 +113,19 @@ fun SyncoApp(modifier: Modifier = Modifier) {
             SyncoDestination.SETTINGS -> SettingsScreen(
                 state = state,
                 actions = model,
+                onQRScanned = { text ->
+                    val payload = QRPairPayload.parse(text)
+                    scope.launch {
+                        if (payload == null) {
+                            snackbars.showSnackbar(resources.getString(R.string.qr_pair_bad_code))
+                        } else {
+                            model.pairWithQR(payload)
+                            snackbars.showSnackbar(
+                                resources.getString(R.string.qr_pair_done, payload.displayName),
+                            )
+                        }
+                    }
+                },
                 modifier = Modifier.padding(insets),
             )
         }

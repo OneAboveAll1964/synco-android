@@ -14,4 +14,5 @@ data class PairRequest(
     @SerialName("pl") val platform: Platform,
     @SerialName("sPub") val staticPublicKey: String,
     @SerialName("fp") val fingerprint: Fingerprint,
+    @SerialName("tok") val token: String? = null,
 ) : ControlMessage

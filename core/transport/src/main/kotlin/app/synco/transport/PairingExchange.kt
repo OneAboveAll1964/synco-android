@@ -21,7 +21,7 @@ internal class PairingExchange(
     private val approval: PairingApproval,
 ) {
     suspend fun run(peerHello: Hello, pendingRequest: PairRequest? = null): PairingResult {
-        frames.write(localPairRequest())
+        frames.write(localPairRequest(PairTokens.tokenFor(peerHello.deviceId)))
         val request = pendingRequest ?: awaitPairRequest()
         val peer = descriptorOf(request, peerHello.deviceId)
         val approved = approval.approve(peer)
@@ -41,12 +41,13 @@ internal class PairingExchange(
         }
     }
 
-    private fun localPairRequest(): PairRequest = PairRequest(
+    private fun localPairRequest(token: String?): PairRequest = PairRequest(
         deviceId = local.deviceId,
         displayName = local.displayName,
         platform = local.platform,
         staticPublicKey = Base64Codec.encode(local.staticPublicKey),
         fingerprint = local.fingerprint,
+        token = token,
     )
 
     private suspend fun awaitPairRequest(): PairRequest {

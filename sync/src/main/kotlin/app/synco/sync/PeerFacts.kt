@@ -8,6 +8,8 @@ import app.synco.protocol.message.CloseReason
 import app.synco.storage.SyncPolicy
 import app.synco.storage.TrustedPeer
 import app.synco.transport.PeerDescriptor
+import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +45,10 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
 
     private val trusted = MutableStateFlow(false)
 
+    private val manual = MutableStateFlow<TrustedPeer?>(null)
+
+    private val manualCursor = AtomicInteger(0)
+
     @Volatile
     private var pairing = false
 
@@ -63,6 +69,7 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
     fun setTrusted(record: TrustedPeer?) {
         rejected.value = record?.rejected == true
         trusted.value = record?.isTrusted == true
+        manual.value = record?.takeIf { it.isTrusted && it.manualHostList.isNotEmpty() }
         current.update {
             it.copy(
                 trusted = record?.isTrusted == true,
@@ -118,17 +125,35 @@ internal class PeerFacts(deviceId: DeviceId, private val role: HandshakeRole, po
     }
 
     fun dialTargets(live: Flow<Boolean>): Flow<DiscoveredPeer> =
-        combine(discovered, rejected, live, trusted) { peer, isRejected, isLive, isTrusted ->
-            peer.takeIf {
-                DialRule.intentOf(
-                    role = role,
-                    discovered = peer != null,
-                    rejected = isRejected,
-                    live = isLive,
-                    trusted = isTrusted,
-                ) == PeerIntent.DIAL
+        combine(discovered, rejected, live, trusted, manual) { peer, isRejected, isLive, isTrusted, fallback ->
+            val intent = DialRule.intentOf(
+                role = role,
+                discovered = peer != null,
+                rejected = isRejected,
+                live = isLive,
+                trusted = isTrusted,
+            )
+            when {
+                peer != null && intent == PeerIntent.DIAL -> peer
+                peer == null && !isLive && !isRejected && fallback != null -> synthesize(fallback)
+                else -> null
             }
         }.filterNotNull()
+
+    private fun synthesize(record: TrustedPeer): DiscoveredPeer? {
+        val fingerprint = record.fingerprint ?: return null
+        val hosts = record.manualHostList
+        val host = hosts[manualCursor.getAndIncrement() % hosts.size]
+        return DiscoveredPeer(
+            deviceId = record.deviceId,
+            displayName = record.displayName,
+            platform = record.platform,
+            fingerprint = fingerprint,
+            host = host,
+            port = record.manualPort ?: return null,
+            lastSeen = Instant.now(),
+        )
+    }
 
     fun disappearances(): Flow<Unit> = discovered.filter { it == null }.map { }
 }
