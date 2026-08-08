@@ -43,17 +43,25 @@ class H264Decoder(
             unit.data
         }
         val flags = if (unit.isConfig) MediaCodec.BUFFER_FLAG_CODEC_CONFIG else 0
-        queue(codec, payload, unit.ptsMicros, flags)
+        if (!queue(codec, payload, unit.ptsMicros, flags)) {
+            SyncoLog.transfer.warn("the decoder ran out of input buffers and lost a picture")
+        }
         drain(codec)
     }
 
-    private fun queue(codec: MediaCodec, payload: ByteArray, ptsMicros: Long, flags: Int) {
-        val index = runCatching { codec.dequeueInputBuffer(DEQUEUE_TIMEOUT_US) }.getOrDefault(-1)
-        if (index < 0) return
-        val input: ByteBuffer = codec.getInputBuffer(index) ?: return
-        input.clear()
-        input.put(payload)
-        codec.queueInputBuffer(index, 0, payload.size, ptsMicros, flags)
+    private fun queue(codec: MediaCodec, payload: ByteArray, ptsMicros: Long, flags: Int): Boolean {
+        repeat(QUEUE_ATTEMPTS) {
+            drain(codec)
+            val index = runCatching { codec.dequeueInputBuffer(DEQUEUE_TIMEOUT_US) }.getOrDefault(-1)
+            if (index >= 0) {
+                val input: ByteBuffer = codec.getInputBuffer(index) ?: return false
+                input.clear()
+                input.put(payload)
+                codec.queueInputBuffer(index, 0, payload.size, ptsMicros, flags)
+                return true
+            }
+        }
+        return false
     }
 
     private fun drain(codec: MediaCodec) {
@@ -74,5 +82,6 @@ class H264Decoder(
 
     private companion object {
         const val DEQUEUE_TIMEOUT_US = 10_000L
+        const val QUEUE_ATTEMPTS = 3
     }
 }
