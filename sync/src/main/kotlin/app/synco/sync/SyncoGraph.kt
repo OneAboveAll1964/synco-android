@@ -27,6 +27,7 @@ class SyncoGraph private constructor(
     val captureTuning: CaptureTuningHolder,
     val transferProgress: SharedFlow<TransferProgress>,
     val clipHistory: ClipHistoryStore,
+    val remote: RemoteController,
     private val transfers: TransferGateway,
 ) {
     fun liveTransferIds(): Set<java.util.UUID> = transfers.liveTransferIds()
@@ -47,6 +48,7 @@ class SyncoGraph private constructor(
                 folderLabel = folder::label,
             )
             val pairings = PairingCoordinator(storage.trustedPeers, state)
+            val remoteController = RemoteController(scope)
             val history = ClipHistoryRecorder(storage.clipHistory, scope)
             val sockets = SyncoSocketFactory()
             val discovery = NsdDiscoveryService.create(application, scope)
@@ -69,6 +71,7 @@ class SyncoGraph private constructor(
                     destination = destination,
                     announcer = ToastAnnouncer(application),
                     shizuku = state,
+                    remote = remoteController,
                 ),
                 pairings = pairings,
                 pipelines = EnginePipelines(
@@ -88,8 +91,10 @@ class SyncoGraph private constructor(
                 ),
                 transfers = transfers.gateway,
                 state = state,
+                media = remoteController,
             )
             val engine = SyncEngine(bootstrap, state, scope)
+            remoteController.bind(engine)
             return SyncoGraph(
                 engine = engine,
                 commands = SyncCommands(
@@ -116,6 +121,7 @@ class SyncoGraph private constructor(
                 captureTuning = captureTuning,
                 transferProgress = transfers.progress,
                 clipHistory = storage.clipHistory,
+                remote = remoteController,
                 transfers = transfers.gateway,
             )
         }

@@ -11,6 +11,7 @@ class ClipRouterFactory(
     private val destination: ReceivedFileDestination,
     private val announcer: ReceivedFileAnnouncer,
     private val shizuku: ShizukuStartSink = ShizukuStartSink.NONE,
+    private val remote: RemoteSignals = RemoteSignals.NONE,
 ) {
     fun create(selfDeviceId: DeviceId, link: PeerLink, settings: PeerPolicySource): ClipRouter =
         ClipRouter(
@@ -24,5 +25,6 @@ class ClipRouterFactory(
             destination = destination,
             announcer = announcer,
             shizuku = shizuku,
+            remote = remote,
         )
 }

@@ -28,6 +28,7 @@ internal class EngineBootstrap(
     private val pipelines: EnginePipelines,
     private val transfers: TransferGateway,
     private val state: SyncStateHolder,
+    private val media: RemoteMediaSink = RemoteMediaSink.NONE,
 ) {
     suspend fun launch(parent: CoroutineScope): EngineRuntime {
         settings.pruneUntrustedDirections()
@@ -44,6 +45,7 @@ internal class EngineBootstrap(
             scope,
             pairings,
             PolicyExchange(local.deviceId, settings),
+            media,
         )
         try {
             val port = endpoint.bind()

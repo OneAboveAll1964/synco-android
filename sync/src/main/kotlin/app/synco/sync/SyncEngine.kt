@@ -56,6 +56,18 @@ class SyncEngine internal constructor(
         runtime?.registry?.routerOf(deviceId)?.requestShizukuStart()
     }
 
+    suspend fun startRemote(deviceId: DeviceId, request: app.synco.protocol.message.RemoteStart) {
+        runtime?.registry?.routerOf(deviceId)?.startRemote(request)
+    }
+
+    suspend fun sendRemoteInput(deviceId: DeviceId, events: List<app.synco.protocol.message.RemoteInputEvent>) {
+        runtime?.registry?.routerOf(deviceId)?.sendRemoteInput(events)
+    }
+
+    suspend fun stopRemote(deviceId: DeviceId) {
+        runtime?.registry?.routerOf(deviceId)?.stopRemote()
+    }
+
     fun reconnect(deviceId: DeviceId) {
         runtime?.registry?.reconnect(deviceId)
     }

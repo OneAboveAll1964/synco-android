@@ -15,6 +15,7 @@ dependencies {
     api(project(":core:clipboard"))
     api(project(":core:storage"))
     api(project(":core:transfer"))
+    api(project(":core:remote"))
     implementation(libs.androidx.core.ktx)
 
     testImplementation(libs.turbine)

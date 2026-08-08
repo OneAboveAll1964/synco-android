@@ -8,6 +8,12 @@ import app.synco.protocol.message.Clip
 import app.synco.protocol.message.Envelope
 import app.synco.protocol.message.TransferAbort
 import app.synco.protocol.message.TransferEnd
+import app.synco.protocol.message.RemoteAccept
+import app.synco.protocol.message.RemoteInput
+import app.synco.protocol.message.RemoteInputEvent
+import app.synco.protocol.message.RemoteReject
+import app.synco.protocol.message.RemoteStart
+import app.synco.protocol.message.RemoteStop
 import app.synco.protocol.message.ShizukuStartRequest
 import app.synco.protocol.message.ShizukuStartResult
 import app.synco.protocol.message.TransferProgressReport
@@ -26,6 +32,7 @@ class ClipRouter(
     destination: ReceivedFileDestination,
     announcer: ReceivedFileAnnouncer,
     private val shizuku: ShizukuStartSink = ShizukuStartSink.NONE,
+    private val remote: RemoteSignals = RemoteSignals.NONE,
 ) {
     private val aborts = OutboundAborts()
 
@@ -46,6 +53,18 @@ class ClipRouter(
         link.send(ShizukuStartRequest)
     }
 
+    suspend fun startRemote(request: RemoteStart) {
+        link.send(request)
+    }
+
+    suspend fun sendRemoteInput(events: List<RemoteInputEvent>) {
+        link.send(RemoteInput(events))
+    }
+
+    suspend fun stopRemote() {
+        link.send(RemoteStop)
+    }
+
     private fun onPeerProgress(report: TransferProgressReport) {
         val transferId = TransferIds.parseOrNull(report.transferId) ?: return
         transfers.reportPeerProgress(transferId, report.receivedBytes)
@@ -62,6 +81,9 @@ class ClipRouter(
             is ShizukuStartResult -> shizuku.report(
                 ShizukuStartReport(envelope.started, envelope.reason),
             )
+            is RemoteAccept -> remote.onRemoteAccepted(envelope.width, envelope.height, envelope.input)
+            is RemoteReject -> remote.onRemoteRejected(envelope.reason)
+            is RemoteStop -> remote.onRemoteStopped()
             else -> Unit
         }
     }
