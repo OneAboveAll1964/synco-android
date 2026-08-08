@@ -2,6 +2,7 @@ package app.synco.transport
 
 import app.synco.protocol.framing.BlobChunk
 import app.synco.protocol.framing.FrameKind
+import app.synco.protocol.framing.MediaFrame
 import app.synco.protocol.message.Bye
 import app.synco.protocol.message.CloseReason
 import app.synco.protocol.message.Envelope
@@ -20,6 +21,7 @@ internal class SessionReceiveLoop(
             val closing = when (payload.kind) {
                 FrameKind.CONTROL -> handle(EnvelopeCodec.decode(payload.body))
                 FrameKind.BLOB -> emitBlob(payload.body)
+                FrameKind.MEDIA -> emitMedia(payload.body)
             }
             if (closing != null) return closing
         }
@@ -40,6 +42,11 @@ internal class SessionReceiveLoop(
 
     private suspend fun emitBlob(body: ByteArray): CloseReason? {
         events.send(SessionEvent.BlobReceived(BlobChunk.decode(body)))
+        return null
+    }
+
+    private suspend fun emitMedia(body: ByteArray): CloseReason? {
+        events.send(SessionEvent.MediaReceived(MediaFrame.decode(body)))
         return null
     }
 }

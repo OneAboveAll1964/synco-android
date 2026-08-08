@@ -33,6 +33,7 @@ internal class PeerSessionRunner(private val hosts: SessionHosts) {
                 }
                 is SessionEvent.Received -> binding?.receive(event.envelope)
                 is SessionEvent.BlobReceived -> binding?.receive(event.chunk)
+                is SessionEvent.MediaReceived -> binding?.receive(event.frame)
                 is SessionEvent.Terminated -> binding?.release(event.reason)
             }
         }

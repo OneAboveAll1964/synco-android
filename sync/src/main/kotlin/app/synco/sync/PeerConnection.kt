@@ -28,6 +28,7 @@ internal class PeerConnection(
     private val scope: CoroutineScope,
     private val backoff: Backoff = Backoff(),
     private val policies: PolicyExchange? = null,
+    private val media: RemoteMediaSink = RemoteMediaSink.NONE,
 ) {
     private val facts = PeerFacts(peerDeviceId, role, settings.policy)
 
@@ -91,7 +92,7 @@ internal class PeerConnection(
         slot.sendCaps()
         publishPolicy()
         events.record(SyncEvent.of(SyncEvent.Kind.PEER_CONNECTED, peerDeviceId))
-        return SessionBinding(this, session, claimed.router)
+        return SessionBinding(this, session, claimed.router, media)
     }
 
     suspend fun release(session: PeerSession, reason: CloseReason?) {

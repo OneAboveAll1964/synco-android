@@ -12,6 +12,7 @@ internal class PeerConnectionFactory(
     private val events: SyncEventSink,
     private val scope: CoroutineScope,
     private val exchange: PolicyExchange? = null,
+    private val media: RemoteMediaSink = RemoteMediaSink.NONE,
 ) {
     fun create(peerDeviceId: DeviceId): PeerConnection {
         val role = DialRule.roleFor(selfDeviceId, peerDeviceId)
@@ -26,6 +27,7 @@ internal class PeerConnectionFactory(
             events = events,
             scope = scope,
             policies = exchange,
+            media = media,
         )
     }
 }
