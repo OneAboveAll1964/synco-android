@@ -17,7 +17,5 @@ internal object StorageKeys {
     val RECEIVED_FOLDER = stringPreferencesKey("received_folder")
     val CAPTURE_WAIT_MILLIS = longPreferencesKey("capture_wait_millis")
     val FOCUS_TIMEOUT_MILLIS = longPreferencesKey("focus_timeout_millis")
-    val CAPTURE_ATTEMPTS = intPreferencesKey("capture_attempts")
-    val GESTURE_WINDOW_MILLIS = longPreferencesKey("gesture_window_millis")
     val CAPTURE_MODE = stringPreferencesKey("capture_mode")
 }

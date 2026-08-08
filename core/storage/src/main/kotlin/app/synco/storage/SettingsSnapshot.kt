@@ -23,9 +23,6 @@ internal class SettingsSnapshot(preferences: Preferences, fallbackDisplayName: S
         waitMillis = preferences[StorageKeys.CAPTURE_WAIT_MILLIS] ?: CaptureWaitChoice.DEFAULT.millis,
         focusTimeoutMillis = preferences[StorageKeys.FOCUS_TIMEOUT_MILLIS]
             ?: FocusTimeoutChoice.DEFAULT.millis,
-        attemptsPerGesture = preferences[StorageKeys.CAPTURE_ATTEMPTS] ?: AttemptsChoice.DEFAULT.attempts,
-        gestureWindowMillis = preferences[StorageKeys.GESTURE_WINDOW_MILLIS]
-            ?: GestureWindowChoice.DEFAULT.millis,
     )
 
     val paused: Boolean = preferences[StorageKeys.PAUSED] ?: false

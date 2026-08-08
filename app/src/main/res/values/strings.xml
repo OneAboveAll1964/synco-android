@@ -112,8 +112,6 @@
     <string name="tuning_subtitle">Raise these if copies are missed on a slower phone. Lower them if Synco feels intrusive.</string>
     <string name="tuning_wait">How long to wait for the clipboard</string>
     <string name="tuning_focus">How long to wait for focus</string>
-    <string name="tuning_window">How long a tap stays armed</string>
-    <string name="tuning_attempts">Reads per tap</string>
     <string name="shizuku_grant">Grant Synco access in Shizuku</string>
     <string name="shizuku_open">Open Shizuku</string>
     <string name="shizuku_get">Get Shizuku</string>

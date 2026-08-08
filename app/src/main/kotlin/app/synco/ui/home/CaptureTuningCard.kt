@@ -16,12 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.synco.R
-import app.synco.storage.AttemptsChoice
 import app.synco.storage.CaptureMode
 import app.synco.storage.CaptureTuning
 import app.synco.storage.CaptureWaitChoice
 import app.synco.storage.FocusTimeoutChoice
-import app.synco.storage.GestureWindowChoice
 
 @Composable
 fun CaptureTuningCard(
@@ -54,18 +52,6 @@ fun CaptureTuningCard(
                 options = FocusTimeoutChoice.entries.map { MillisText.of(it.millis) to it.millis },
                 selected = FocusTimeoutChoice.nearest(tuning.focusTimeoutMillis).millis,
                 onSelect = { onTuningChange(tuning.copy(focusTimeoutMillis = it)) },
-            )
-            ChoiceRow(
-                label = stringResource(R.string.tuning_window),
-                options = GestureWindowChoice.entries.map { MillisText.of(it.millis) to it.millis },
-                selected = GestureWindowChoice.nearest(tuning.gestureWindowMillis).millis,
-                onSelect = { onTuningChange(tuning.copy(gestureWindowMillis = it)) },
-            )
-            ChoiceRow(
-                label = stringResource(R.string.tuning_attempts),
-                options = AttemptsChoice.entries.map { "${it.attempts}" to it.attempts.toLong() },
-                selected = AttemptsChoice.nearest(tuning.attemptsPerGesture).attempts.toLong(),
-                onSelect = { onTuningChange(tuning.copy(attemptsPerGesture = it.toInt())) },
             )
         }
     }

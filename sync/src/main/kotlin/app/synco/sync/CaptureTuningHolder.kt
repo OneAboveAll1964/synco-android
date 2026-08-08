@@ -24,9 +24,5 @@ class CaptureTuningHolder(settings: SettingsStore, scope: CoroutineScope) {
 
     fun focusTimeoutMillis(): Long = tuning.focusTimeoutMillis
 
-    fun attemptsPerGesture(): Int = tuning.attemptsPerGesture
-
-    fun gestureWindowMillis(): Long = tuning.gestureWindowMillis
-
     fun mode(): CaptureMode = mode
 }

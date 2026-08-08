@@ -80,8 +80,6 @@ class DataStoreSettingsStore internal constructor(
     override suspend fun setCaptureTuning(tuning: CaptureTuning) = write { preferences ->
         preferences[StorageKeys.CAPTURE_WAIT_MILLIS] = tuning.waitMillis
         preferences[StorageKeys.FOCUS_TIMEOUT_MILLIS] = tuning.focusTimeoutMillis
-        preferences[StorageKeys.CAPTURE_ATTEMPTS] = tuning.attemptsPerGesture
-        preferences[StorageKeys.GESTURE_WINDOW_MILLIS] = tuning.gestureWindowMillis
     }
 
     override suspend fun setPaused(paused: Boolean) = write { preferences ->
