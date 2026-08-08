@@ -1,10 +1,24 @@
 package app.synco.ui.history
 
 import android.content.Context
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import app.synco.R
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
+
+object ClockText {
+
+    private val format: DateFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
+
+    fun of(atMillis: Long): String = format.format(Date(atMillis))
+}
 
 object DayText {
 
@@ -33,4 +47,16 @@ object DayText {
     }.timeInMillis
 
     private const val DAY_MILLIS = 24L * 60 * 60 * 1000
+}
+
+@Composable
+fun DayHeader(label: String, modifier: Modifier = Modifier) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 4.dp),
+    )
 }
