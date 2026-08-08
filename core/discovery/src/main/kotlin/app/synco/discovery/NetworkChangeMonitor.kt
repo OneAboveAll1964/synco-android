@@ -17,23 +17,20 @@ class NetworkChangeMonitor(
 ) : NetworkMonitor {
 
     override val changes: Flow<NetworkChange> = callbackFlow {
+        val addresses = HashMap<Network, String>()
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 trySend(NetworkChange.AVAILABLE)
             }
 
-            override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities,
-            ) {
-                trySend(NetworkChange.RECONFIGURED)
-            }
-
             override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                val fingerprint = fingerprintOf(linkProperties)
+                if (addresses.put(network, fingerprint) == fingerprint) return
                 trySend(NetworkChange.RECONFIGURED)
             }
 
             override fun onLost(network: Network) {
+                addresses.remove(network)
                 trySend(NetworkChange.UNAVAILABLE)
             }
         }
@@ -42,6 +39,14 @@ class NetworkChangeMonitor(
             runCatching { connectivityManager.unregisterNetworkCallback(callback) }
         }
     }.buffer(Channel.CONFLATED)
+
+    private fun fingerprintOf(linkProperties: LinkProperties): String = buildString {
+        append(linkProperties.interfaceName ?: "?")
+        linkProperties.linkAddresses
+            .map { it.toString() }
+            .sorted()
+            .forEach { append('|').append(it) }
+    }
 
     companion object {
         private val LOCAL_NETWORKS: NetworkRequest = NetworkRequest.Builder()
