@@ -34,6 +34,7 @@ class SyncoForegroundService : LifecycleService() {
             clipboard = ShizukuClipboard(),
             capture = graph.clipboard,
             tuning = graph.captureTuning,
+            syncIsOn = { graph.state.value.let { it.running && !it.paused } },
         )
     }
 
@@ -97,7 +98,7 @@ class SyncoForegroundService : LifecycleService() {
     private fun runSync() {
         if (syncing) return
         syncing = true
-        CaptureSwitch.turnOn()
+        lifecycleScope.launch { graph.settings.setSyncRequested(true) }
         locks.acquire()
         graph.commands.start()
     }
@@ -108,7 +109,7 @@ class SyncoForegroundService : LifecycleService() {
 
     private fun shutDown() {
         syncing = false
-        CaptureSwitch.turnOff()
+        lifecycleScope.launch { graph.settings.setSyncRequested(false) }
         graph.commands.stop()
         locks.release()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -116,7 +117,6 @@ class SyncoForegroundService : LifecycleService() {
     }
 
     private fun publish(state: SyncState) {
-        CaptureSwitch.set(state.running && !state.paused)
         if (syncing) notifications.update(state)
     }
 

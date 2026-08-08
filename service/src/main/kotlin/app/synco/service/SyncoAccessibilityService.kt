@@ -41,8 +41,6 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
             ownPackageName = packageName,
             excludedPackages = { excluded },
             keyboardPackages = { keyboards },
-            gestureWindowMillis = { tuning?.gestureWindowMillis() ?: DEFAULT_GESTURE_WINDOW },
-            attemptsPerGesture = { tuning?.attemptsPerGesture() ?: DEFAULT_ATTEMPTS },
         )
         if (EventFirehose.isEnabled) {
             serviceInfo = EventFirehose.widen(serviceInfo)
@@ -83,7 +81,7 @@ class SyncoAccessibilityService : AccessibilityService(), GatedCapture {
     )
 
     private fun syncIsOn(): Boolean {
-        val state = syncoGraphOrNull()?.state?.value ?: return CaptureSwitch.isOn.value
+        val state = syncoGraphOrNull()?.state?.value ?: return false
         return state.running && !state.paused
     }
 

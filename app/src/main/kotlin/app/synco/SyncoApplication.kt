@@ -26,6 +26,9 @@ class SyncoApplication : Application(), SyncoGraphOwner {
     }
 
     private suspend fun startWhenConfigured() {
-        if (syncoGraph.settings.launchOnBoot.first()) SyncoServiceLauncher.start(this)
+        val settings = syncoGraph.settings
+        if (settings.launchOnBoot.first() || settings.syncRequested.first()) {
+            SyncoServiceLauncher.start(this)
+        }
     }
 }

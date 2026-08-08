@@ -26,6 +26,7 @@ class ShizukuCaptureLoop(
     private val clipboard: ShizukuClipboard,
     private val capture: ClipboardCapture,
     private val tuning: CaptureTuningHolder,
+    private val syncIsOn: () -> Boolean,
     private val watch: ShizukuClipboardWatch = ShizukuClipboardWatch(),
 ) {
     private val stateFlow = MutableStateFlow(ShizukuState.NOT_INSTALLED)
@@ -71,7 +72,7 @@ class ShizukuCaptureLoop(
 
     fun stopWatching() = watch.stop()
 
-    private fun enabled(): Boolean = CaptureSwitch.isOn.value && tuning.mode() == CaptureMode.SHIZUKU
+    private fun enabled(): Boolean = syncIsOn() && tuning.mode() == CaptureMode.SHIZUKU
 
     private fun publish(next: ShizukuState) {
         if (next != stateFlow.value) SyncoLog.clipboard.info("Shizuku capture is $next")
