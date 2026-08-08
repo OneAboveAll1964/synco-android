@@ -28,6 +28,8 @@ interface HomeActions {
 
     fun pairWithQR(payload: QRPairPayload)
 
+    fun controlRemote(deviceId: DeviceId)
+
     fun applyHistoryClip(entry: app.synco.storage.ClipHistoryEntry)
 
 

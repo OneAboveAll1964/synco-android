@@ -26,6 +26,7 @@ fun PeerCard(
     onSendChange: (ClipCategory, Boolean) -> Unit,
     onReceiveChange: (ClipCategory, Boolean) -> Unit,
     onReconnect: () -> Unit,
+    onControl: () -> Unit,
     onForget: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -53,6 +54,11 @@ fun PeerCard(
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 TextButton(onClick = onReconnect, enabled = peer.trusted && !peer.isConnected) {
                     Text(text = stringResource(R.string.peer_reconnect))
+                }
+                if (peer.canControl) {
+                    TextButton(onClick = onControl) {
+                        Text(text = stringResource(R.string.peer_control))
+                    }
                 }
                 TextButton(onClick = onForget, enabled = peer.trusted || peer.isRejected) {
                     Text(text = stringResource(R.string.peer_forget))

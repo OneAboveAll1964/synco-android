@@ -2,6 +2,7 @@ package app.synco.ui.home
 
 import app.synco.protocol.DeviceId
 import app.synco.protocol.Fingerprint
+import app.synco.protocol.Platform
 import app.synco.protocol.message.CapsFlags
 import app.synco.storage.SyncPolicy
 import app.synco.storage.TrustedPeer
@@ -13,6 +14,7 @@ data class PeerRow(
     val deviceId: DeviceId,
     val displayName: String,
     val fingerprint: Fingerprint?,
+    val platform: Platform?,
     val status: PeerConnectionStatus,
     val trusted: Boolean,
     val direction: SyncDirection,
@@ -25,11 +27,14 @@ data class PeerRow(
 
     val isRejected: Boolean get() = status == PeerConnectionStatus.REJECTED
 
+    val canControl: Boolean get() = trusted && isConnected && platform == Platform.MACOS
+
     companion object {
         fun of(view: PeerView): PeerRow = PeerRow(
             deviceId = view.deviceId,
             displayName = view.displayName,
             fingerprint = view.fingerprint,
+            platform = view.platform,
             status = view.status,
             trusted = view.trusted,
             direction = SyncDirection.of(view.policy.directions),
@@ -43,6 +48,7 @@ data class PeerRow(
             deviceId = peer.deviceId,
             displayName = peer.displayName,
             fingerprint = peer.fingerprint,
+            platform = null,
             status = if (peer.rejected) PeerConnectionStatus.REJECTED else PeerConnectionStatus.OFFLINE,
             trusted = peer.isTrusted,
             direction = SyncDirection.of(policy.directions),

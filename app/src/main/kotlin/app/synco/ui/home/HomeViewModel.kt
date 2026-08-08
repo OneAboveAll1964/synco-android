@@ -103,6 +103,20 @@ class HomeViewModel(
         graph.commands.adoptQRPeer(payload)
     }
 
+    val remoteState get() = graph.remote.state
+
+    override fun controlRemote(deviceId: DeviceId) {
+        graph.remote.connect(deviceId, REMOTE_MAX_WIDTH, REMOTE_MAX_HEIGHT, REMOTE_FPS)
+    }
+
+    fun remoteSurfaceReady(surface: android.view.Surface) = graph.remote.attachSurface(surface)
+
+    fun remoteSurfaceLost() = graph.remote.detachSurface()
+
+    fun remoteInput(events: List<app.synco.protocol.message.RemoteInputEvent>) = graph.remote.sendInput(events)
+
+    fun disconnectRemote() = graph.remote.disconnect()
+
     override fun setCaptureMode(mode: CaptureMode) {
         graph.commands.setCaptureMode(mode)
     }
@@ -162,6 +176,9 @@ class HomeViewModel(
     }
 
     private companion object {
+        const val REMOTE_MAX_WIDTH = 1280
+        const val REMOTE_MAX_HEIGHT = 2400
+        const val REMOTE_FPS = 60
         const val SUBSCRIPTION_GRACE_MILLIS = 5_000L
     }
 }

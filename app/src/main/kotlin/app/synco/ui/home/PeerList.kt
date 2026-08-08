@@ -41,6 +41,7 @@ fun PeerList(peers: List<PeerRow>, actions: HomeActions, modifier: Modifier = Mo
                     actions.setReceiveEnabled(peer.deviceId, category, enabled)
                 },
                 onReconnect = { actions.reconnectPeer(peer.deviceId) },
+                onControl = { actions.controlRemote(peer.deviceId) },
                 onForget = { actions.forgetPeer(peer.deviceId) },
             )
         }

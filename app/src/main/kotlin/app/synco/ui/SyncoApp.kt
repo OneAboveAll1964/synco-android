@@ -27,11 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.activity.compose.BackHandler
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import app.synco.R
 import app.synco.storage.CaptureMode
 import app.synco.sync.QRPairPayload
+import app.synco.sync.RemoteState
 import app.synco.ui.home.HomeScreen
 import app.synco.ui.home.HomeViewModel
 import app.synco.ui.home.HomeViewModelFactory
@@ -42,6 +44,7 @@ import app.synco.ui.home.SettingsScreen
 import app.synco.ui.home.shizukuStartMessageRes
 import app.synco.ui.home.homeStatusText
 import app.synco.ui.pairing.PairingDialog
+import app.synco.ui.remote.RemoteScreen
 import app.synco.ui.permissions.rememberPermissionsController
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -51,6 +54,7 @@ fun SyncoApp(modifier: Modifier = Modifier) {
     val factory = remember(context) { HomeViewModelFactory(context) }
     val model: HomeViewModel = viewModel(factory = factory)
     val state by model.state.collectAsState()
+    val remote by model.remoteState.collectAsState()
     val permissions = rememberPermissionsController(
         clipboardReadElsewhere = state.captureMode == CaptureMode.SHIZUKU && state.shizukuState.isUsable,
     )
@@ -140,6 +144,17 @@ fun SyncoApp(modifier: Modifier = Modifier) {
             onDismiss = { sending = false },
             onSendText = model::sendText,
             onSendFile = model::sendFile,
+        )
+    }
+
+    if (remote !is RemoteState.Idle) {
+        BackHandler { model.disconnectRemote() }
+        RemoteScreen(
+            state = remote,
+            onSurfaceReady = model::remoteSurfaceReady,
+            onSurfaceLost = model::remoteSurfaceLost,
+            onInput = model::remoteInput,
+            onClose = model::disconnectRemote,
         )
     }
 
