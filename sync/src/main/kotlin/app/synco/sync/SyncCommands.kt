@@ -28,6 +28,7 @@ class SyncCommands internal constructor(
     private val clipboard: ClipboardCapture,
     private val scope: CoroutineScope,
     private val manual: app.synco.clipboard.ManualClips,
+    private val applyLocally: (app.synco.clipboard.ClipboardSnapshot) -> Boolean = { false },
     private val events: SyncEventSink,
     private val reports: ShizukuStartReports,
     private val rows: TransferRows,
@@ -111,6 +112,12 @@ class SyncCommands internal constructor(
     fun cancelTransfer(transferId: UUID) {
         transfers.cancel(transferId)
         rows.dropTransfer(transferId)
+    }
+
+    fun applyHistoryClip(text: String) = fire {
+        val snapshot = manual.text(text) ?: return@fire
+        applyLocally(snapshot)
+        engine.broadcast(snapshot)
     }
 
     fun sendText(value: String) = fire {

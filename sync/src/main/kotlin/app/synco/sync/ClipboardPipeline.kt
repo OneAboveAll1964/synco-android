@@ -10,11 +10,13 @@ internal class ClipboardPipeline(
     private val capture: ClipboardCapture,
     private val dispatcher: OutboundClipDispatcher,
     private val state: SyncStateHolder,
+    private val history: ClipHistoryRecorder,
 ) {
     suspend fun run(registry: PeerSessionRegistry) {
         coroutineScope {
             launch { capture.status.collect { publishStatus(it) } }
             capture.changes.collect { captured ->
+                history.local(captured.snapshot.reps)
                 dispatcher.dispatch(captured.snapshot, registry.routers())
             }
         }

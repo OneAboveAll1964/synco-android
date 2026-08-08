@@ -26,6 +26,8 @@ fun HomeScreen(
         }
         ActivityScreen(
             history = state.history,
+            clips = state.clips,
+            onClipTap = { actions.applyHistoryClip(it) },
             nowMillis = nowMillis,
             modifier = Modifier.weight(1f),
         )

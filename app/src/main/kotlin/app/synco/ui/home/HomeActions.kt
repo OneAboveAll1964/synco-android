@@ -28,6 +28,8 @@ interface HomeActions {
 
     fun pairWithQR(payload: QRPairPayload)
 
+    fun applyHistoryClip(entry: app.synco.storage.ClipHistoryEntry)
+
 
     fun setDirection(deviceId: DeviceId, direction: SyncDirection)
 

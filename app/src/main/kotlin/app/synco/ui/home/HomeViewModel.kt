@@ -46,7 +46,7 @@ class HomeViewModel(
             capture.second,
             capture.third,
         )
-    }.stateIn(
+    }.combine(graph.clipHistory.entries) { ui, clips -> ui.copy(clips = clips) }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIPTION_GRACE_MILLIS),
         initialValue = HomeUiState.EMPTY,
@@ -93,6 +93,10 @@ class HomeViewModel(
 
     override fun setCaptureTuning(tuning: CaptureTuning) {
         graph.commands.setCaptureTuning(tuning)
+    }
+
+    override fun applyHistoryClip(entry: app.synco.storage.ClipHistoryEntry) {
+        graph.commands.applyHistoryClip(entry.text)
     }
 
     override fun pairWithQR(payload: QRPairPayload) {

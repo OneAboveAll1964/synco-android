@@ -5,6 +5,7 @@ import app.synco.clipboard.ClipboardCapture
 import app.synco.discovery.NetworkChangeMonitor
 import app.synco.discovery.NsdDiscoveryService
 import app.synco.storage.CaptureMode
+import app.synco.storage.ClipHistoryStore
 import app.synco.storage.SettingsStore
 import app.synco.storage.SyncoStorage
 import app.synco.storage.TrustedPeerStore
@@ -25,6 +26,7 @@ class SyncoGraph private constructor(
     val clipboard: ClipboardCapture,
     val captureTuning: CaptureTuningHolder,
     val transferProgress: SharedFlow<TransferProgress>,
+    val clipHistory: ClipHistoryStore,
     private val transfers: TransferGateway,
 ) {
     fun liveTransferIds(): Set<java.util.UUID> = transfers.liveTransferIds()
@@ -45,6 +47,7 @@ class SyncoGraph private constructor(
                 folderLabel = folder::label,
             )
             val pairings = PairingCoordinator(storage.trustedPeers, state)
+            val history = ClipHistoryRecorder(storage.clipHistory, scope)
             val sockets = SyncoSocketFactory()
             val discovery = NsdDiscoveryService.create(application, scope)
             val bootstrap = EngineBootstrap(
@@ -59,7 +62,7 @@ class SyncoGraph private constructor(
                 ),
                 discovery = discovery,
                 routers = ClipRouterFactory(
-                    clipboard = clipboard.sink,
+                    clipboard = HistoryRecordingSink(clipboard.sink, history),
                     transfers = transfers.gateway,
                     blobs = TransferBlobSender(transfers.gateway),
                     events = state,
@@ -74,6 +77,7 @@ class SyncoGraph private constructor(
                         capture = clipboard.capture,
                         dispatcher = OutboundClipDispatcher(transfers.gateway),
                         state = state,
+                        history = history,
                     ),
                     policies = PolicyPipeline(storage.settings, state),
                     network = NetworkPipeline(
@@ -98,6 +102,9 @@ class SyncoGraph private constructor(
                     clipboard = clipboard.capture,
                     scope = scope,
                     manual = clipboard.manual,
+                    applyLocally = { snapshot ->
+                        clipboard.sink.apply(snapshot.hash, snapshot.reps, emptyMap())
+                    },
                     events = state,
                     reports = state,
                     rows = state,
@@ -108,6 +115,7 @@ class SyncoGraph private constructor(
                 clipboard = clipboard.capture,
                 captureTuning = captureTuning,
                 transferProgress = transfers.progress,
+                clipHistory = storage.clipHistory,
                 transfers = transfers.gateway,
             )
         }

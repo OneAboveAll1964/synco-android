@@ -28,6 +28,7 @@ data class HomeUiState(
     val pendingPairing: PendingPairing?,
     val problem: SyncProblem?,
     val history: List<SyncEvent>,
+    val clips: List<app.synco.storage.ClipHistoryEntry> = emptyList(),
     val clipboardStatus: ClipboardCaptureStatus,
     val shizukuStart: ShizukuStartReport? = null,
     val shizukuStartPending: Boolean = false,

@@ -118,6 +118,9 @@
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
     <string name="history_empty">Nothing has moved between your devices yet.</string>
+    <string name="clips_title">Clipboard history</string>
+    <string name="clip_from_peer">From your Mac · %1$s</string>
+    <string name="clip_from_here">Copied here · %1$s</string>
     <string name="history_clip_sent">Sent a clip</string>
     <string name="history_clip_dropped">A clip was not sent</string>
     <string name="history_clip_acknowledged">Your Mac took the clip</string>

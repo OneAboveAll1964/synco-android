@@ -6,6 +6,7 @@ class SyncoStorage private constructor(
     val settings: SettingsStore,
     val trustedPeers: TrustedPeerStore,
     val identity: IdentityStore,
+    val clipHistory: ClipHistoryStore,
 ) {
     companion object {
         fun create(context: Context): SyncoStorage {
@@ -14,6 +15,7 @@ class SyncoStorage private constructor(
                 settings = DataStoreSettingsStore(preferences),
                 trustedPeers = DataStoreTrustedPeerStore(preferences),
                 identity = EncryptedIdentityStore(context),
+                clipHistory = ClipHistoryStore(preferences),
             )
         }
     }

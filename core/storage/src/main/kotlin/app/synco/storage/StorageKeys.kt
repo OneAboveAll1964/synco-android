@@ -12,6 +12,7 @@ internal object StorageKeys {
     val PAUSED = booleanPreferencesKey("paused")
     val MAX_BLOB_BYTES = longPreferencesKey("max_blob_bytes")
     val DEFAULT_DIRECTIONS = stringPreferencesKey("default_directions")
+    val CLIP_HISTORY = stringPreferencesKey("clip_history")
     val PEER_DIRECTIONS = stringPreferencesKey("peer_directions")
     val TRUSTED_PEERS = stringPreferencesKey("trusted_peers")
     val RECEIVED_FOLDER = stringPreferencesKey("received_folder")
