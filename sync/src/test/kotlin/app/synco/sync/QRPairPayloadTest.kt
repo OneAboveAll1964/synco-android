@@ -56,6 +56,8 @@ class QRPairPayloadTest {
     @Test
     fun `garbage and missing pieces are refused`() {
         assertNull(QRPairPayload.parse("https://example.com/?did=x"))
+        assertNull(QRPairPayload.parse(payload(did = "nonsense")))
+        assertNull(QRPairPayload.parse(payload(did = "UPPER!chars#bad$")))
         assertNull(QRPairPayload.parse(payload(port = "0")))
         assertNull(QRPairPayload.parse(payload(port = "99999")))
         assertNull(QRPairPayload.parse(payload(hosts = "")))

@@ -24,7 +24,7 @@ data class QRPairPayload(
                 key to URLDecoder.decode(pair.substringAfter('='), Charsets.UTF_8)
             }.toMap()
             if (fields["v"] != "1") return null
-            val deviceId = fields["did"]?.takeIf(String::isNotBlank)?.let(::DeviceId) ?: return null
+            val deviceId = fields["did"]?.let(DeviceId::parseOrNull) ?: return null
             val key = fields["key"]?.let(::decodeUrlSafe) ?: return null
             if (key.size != HandshakeConstants.X25519_KEY_BYTES) return null
             if (!PeerIdentity.matches(key, deviceId)) return null
