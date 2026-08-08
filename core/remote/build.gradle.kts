@@ -8,5 +8,6 @@ android {
 
 dependencies {
     api(project(":core:protocol"))
+    implementation(project(":core:logging"))
     testImplementation(libs.junit)
 }
