@@ -19,3 +19,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 }
+
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    dependsOn(rootProject.tasks.named("verifyProtocol"))
+}
