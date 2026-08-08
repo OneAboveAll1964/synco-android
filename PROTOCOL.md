@@ -109,6 +109,7 @@ A decrypted (or plaintext) payload is:
 |--------|--------------------------------------------------------------|
 | `0x01` | JSON control message — body is UTF-8 JSON, an object with `t` |
 | `0x02` | Blob chunk — body is the layout below                         |
+| `0x03` | Media frame — encoded remote-desktop video, body below (§11) |
 
 Blob chunk body:
 
@@ -588,3 +589,108 @@ Close reasons, sent best-effort as `{"t":"bye","reason":"..."}` before the socke
 `versionMismatch`, `selfConnection`, `unknownKey`, `didMismatch`, `badHandshake`,
 `badAuth`, `frameTooLarge`, `replay`, `timeout`, `duplicateSession`, `shutdown`,
 `unpaired`.
+
+---
+
+## 11. Remote control
+
+Remote control lets a paired phone view and drive the Mac's screen over the same
+encrypted connection. It is off until the phone requests it, and the Mac never grants it
+without the operating-system permissions it needs (screen recording to capture, and
+accessibility to inject input). Only the phone may drive the Mac; the Mac is always the
+host.
+
+### 11.1 Session lifecycle
+
+The phone opens a session:
+
+```json
+{ "t": "remoteStart", "maxWidth": 1600, "maxHeight": 2560, "fps": 60, "input": true }
+```
+
+`maxWidth`/`maxHeight` bound the streamed resolution (the Mac scales its display down to
+fit while keeping aspect ratio); `fps` is the desired frame rate the Mac may cap; `input`
+asks for input injection as well as viewing.
+
+The Mac replies with exactly one of:
+
+```json
+{ "t": "remoteAccept", "codec": "h264", "width": 1600, "height": 1000, "fps": 60,
+  "input": true }
+```
+
+```json
+{ "t": "remoteReject", "reason": "screenPermission" }
+```
+
+`remoteReject` reasons: `screenPermission` (screen recording not granted),
+`inputPermission` (accessibility not granted — sent only when the phone asked for input
+and viewing is still offered via a follow-up `remoteAccept` with `"input": false`),
+`busy` (a session is already active), `unsupported` (the host build has no remote
+support). On `remoteAccept` the Mac begins sending media frames (§11.3) immediately.
+
+Either side ends the session:
+
+```json
+{ "t": "remoteStop" }
+```
+
+The Mac also emits `remoteStop` if screen capture stops (display asleep, permission
+revoked). A `bye` or a dropped connection ends any active remote session implicitly.
+
+### 11.2 Input
+
+While a session with `"input": true` is active, the phone sends input in batches so a
+gesture is one frame rather than many:
+
+```json
+{ "t": "remoteInput", "ev": [ { "k": "pa", "x": 0.42, "y": 0.31 }, { "k": "b", "btn": "left", "down": true } ] }
+```
+
+Each event `k` is one of:
+
+| `k`  | meaning            | fields                                             |
+|------|--------------------|----------------------------------------------------|
+| `pa` | pointer, absolute  | `x`,`y` in `0..1` of the streamed frame            |
+| `pm` | pointer, relative  | `dx`,`dy` in streamed-frame pixels                 |
+| `b`  | button             | `btn` = `left`\|`right`\|`middle`, `down` bool     |
+| `s`  | scroll / wheel     | `dx`,`dy` (positive `dy` scrolls content up)       |
+| `z`  | magnify (pinch)    | `scale` — incremental factor, `1.0` is no change   |
+| `k`  | key                | `code` (§11.4), `down` bool, `mods` bitmask        |
+| `txt`| text              | `s` — a UTF-8 string typed as-is                    |
+
+The Mac clamps `pa` to `0..1`, maps into current display coordinates, and injects each
+event in array order. Unknown `k` values are skipped, never fatal.
+
+### 11.3 Media frames
+
+Media frames are frame kind `0x03` (§3). One encoded picture may be split across several
+media frames when it exceeds the frame cap; fragments of one picture share `seq` and
+arrive in order.
+
+```
++-----------+---------+----------+-------------+------------------+
+| stream:1  | flags:1 | seq:4    | pts:8       | data: remainder  |
++-----------+---------+----------+-------------+------------------+
+```
+
+`stream` is the media stream id (`0` = primary display). `seq` is a big-endian `uint32`
+picture sequence number. `pts` is a big-endian `uint64` presentation time in microseconds.
+`flags` is a bitmask:
+
+| bit    | meaning                                                        |
+|--------|----------------------------------------------------------------|
+| `0x01` | keyframe (IDR)                                                 |
+| `0x02` | codec config (H.264 SPS/PPS, sent before the first keyframe)   |
+| `0x04` | last fragment of this `seq` (the decoder may now assemble it)  |
+
+`data` is Annex-B H.264 (start-code delimited NAL units). The receiver concatenates all
+fragments of a `seq` in order until it sees `0x04`, then feeds the assembled access unit
+to its decoder. Config frames (`0x02`) carry SPS/PPS and are resent with every keyframe so
+a phone that joins mid-stream can start on the next keyframe.
+
+### 11.4 Key codes
+
+`code` is the USB HID usage id of the key (HID Usage Page 0x07, Keyboard/Keypad), the same
+namespace both platforms can map to and from without a shared table. `mods` is a bitmask:
+`0x01` shift, `0x02` control, `0x04` alt/option, `0x08` meta/command.

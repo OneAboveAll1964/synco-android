@@ -18,6 +18,11 @@ object MessageType {
     const val TRANSFER_PROGRESS = "transferProgress"
     const val SHIZUKU_START = "shizukuStart"
     const val SHIZUKU_START_RESULT = "shizukuStartResult"
+    const val REMOTE_START = "remoteStart"
+    const val REMOTE_ACCEPT = "remoteAccept"
+    const val REMOTE_REJECT = "remoteReject"
+    const val REMOTE_STOP = "remoteStop"
+    const val REMOTE_INPUT = "remoteInput"
     const val ACK = "ack"
     const val BYE = "bye"
 
@@ -37,6 +42,11 @@ object MessageType {
         TRANSFER_PROGRESS,
         SHIZUKU_START,
         SHIZUKU_START_RESULT,
+        REMOTE_START,
+        REMOTE_ACCEPT,
+        REMOTE_REJECT,
+        REMOTE_STOP,
+        REMOTE_INPUT,
         ACK,
         BYE,
     )

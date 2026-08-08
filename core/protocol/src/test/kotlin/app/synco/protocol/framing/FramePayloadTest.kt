@@ -14,9 +14,11 @@ class FramePayloadTest {
     fun `numbers the control kind one and the blob kind two`() {
         assertEquals(0x01.toByte(), FrameKind.CONTROL.code)
         assertEquals(0x02.toByte(), FrameKind.BLOB.code)
+        assertEquals(0x03.toByte(), FrameKind.MEDIA.code)
         assertEquals(FrameKind.CONTROL, FrameKind.fromCode(0x01))
         assertEquals(FrameKind.BLOB, FrameKind.fromCode(0x02))
-        assertNull(FrameKind.fromCode(0x03))
+        assertEquals(FrameKind.MEDIA, FrameKind.fromCode(0x03))
+        assertNull(FrameKind.fromCode(0x04))
     }
 
     @Test

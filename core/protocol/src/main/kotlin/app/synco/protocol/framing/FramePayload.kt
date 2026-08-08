@@ -31,6 +31,8 @@ class FramePayload(val kind: FrameKind, val body: ByteArray) {
 
         fun blob(chunk: BlobChunk): FramePayload = FramePayload(FrameKind.BLOB, chunk.encode())
 
+        fun media(frame: MediaFrame): FramePayload = FramePayload(FrameKind.MEDIA, frame.encode())
+
         fun decode(payload: ByteArray): FramePayload {
             if (payload.size < ProtocolConstants.FRAME_KIND_BYTES) {
                 throw SyncoError.Malformed("a frame payload must carry a kind byte")
