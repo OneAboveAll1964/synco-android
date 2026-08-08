@@ -7,11 +7,16 @@ import java.lang.reflect.Method
 
 class ShizukuClipboard {
 
+    private data class Connection(val service: Any, val method: Method)
+
+    @Volatile
+    private var cached: Connection? = null
+
     @Volatile
     private var described = false
 
     fun read(): ShizukuRead = try {
-        ShizukuRead.Clip(readThroughShell())
+        ShizukuRead.Clip(readThroughShell(retryOnStaleBinder = true))
     } catch (denied: SecurityException) {
         SyncoLog.clipboard.warn("Shizuku refused the clipboard call", denied)
         ShizukuRead.Denied
@@ -32,7 +37,21 @@ class ShizukuClipboard {
         return ShizukuRead.Unavailable
     }
 
-    private fun readThroughShell(): ClipData? {
+    private fun readThroughShell(retryOnStaleBinder: Boolean): ClipData? {
+        val connection = connected() ?: return null
+        val arguments = ClipboardService.argumentsFor(connection.method)
+        describeOnce(connection.method, arguments)
+        return try {
+            connection.method.invoke(connection.service, *arguments) as? ClipData
+        } catch (invocation: InvocationTargetException) {
+            cached = null
+            if (!retryOnStaleBinder) throw invocation
+            readThroughShell(retryOnStaleBinder = false)
+        }
+    }
+
+    private fun connected(): Connection? {
+        cached?.let { return it }
         val service = ClipboardService.connect() ?: run {
             SyncoLog.clipboard.warn("Shizuku could not reach the clipboard service")
             return null
@@ -41,9 +60,7 @@ class ShizukuClipboard {
             SyncoLog.clipboard.warn("no $GET_PRIMARY_CLIP on ${service.javaClass.name}")
             return null
         }
-        val arguments = ClipboardService.argumentsFor(method)
-        describeOnce(method, arguments)
-        return method.invoke(service, *arguments) as? ClipData
+        return Connection(service, method).also { cached = it }
     }
 
     private fun describeOnce(method: Method, arguments: Array<Any?>) {
